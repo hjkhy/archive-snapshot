@@ -1,6 +1,7 @@
-# archive snapshot
+# sok — archive snapshot
 
-Static snapshot — browse the site via GitHub Pages (Settings → Pages → Deploy from branch → main → /).
+Static snapshot of a Discord server (all text + media thumbnails).
 
-- `index.html` — archive home (start here)
-- `sok-reader.html` — single-file lightweight reader (3.5 MB)
+- **Browse:** https://hjkhy.github.io/sok/
+- **Single-file reader:** https://hjkhy.github.io/sok/sok-reader.html
+- **Full-res download:** the Releases page, three zips (unzip all into one folder)

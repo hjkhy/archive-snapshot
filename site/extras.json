@@ -1,0 +1,69 @@
+{
+ "guild_id": "1525533054574002246",
+ "images": {
+  "icon": "assets/server_icon_8508bb837641.png"
+ },
+ "emojis": [
+  {
+   "id": "1535572461502996490",
+   "name": "emoji_1",
+   "animated": false,
+   "roles": [],
+   "local": "assets/emoji_1535572461502996490.png"
+  },
+  {
+   "id": "1535573564390899812",
+   "name": "emoji_2",
+   "animated": false,
+   "roles": [],
+   "local": "assets/emoji_1535573564390899812.png"
+  },
+  {
+   "id": "1535573611430023178",
+   "name": "emoji_3",
+   "animated": false,
+   "roles": [],
+   "local": "assets/emoji_1535573611430023178.png"
+  },
+  {
+   "id": "1535575303248674888",
+   "name": "emoji_4",
+   "animated": false,
+   "roles": [],
+   "local": "assets/emoji_1535575303248674888.png"
+  },
+  {
+   "id": "1535575470152884244",
+   "name": "emoji_5",
+   "animated": false,
+   "roles": [],
+   "local": "assets/emoji_1535575470152884244.png"
+  }
+ ],
+ "stickers": [
+  {
+   "id": "1535574646714273823",
+   "name": "trash",
+   "description": "trash",
+   "tags": "🇮🇳",
+   "format_type": 1,
+   "local": "assets/sticker_1535574646714273823.png"
+  }
+ ],
+ "scheduled_events": null,
+ "pins": {},
+ "unavailable": {
+  "scheduled-events": "HTTP 403",
+  "guild-preview": "HTTP 404",
+  "widget": "HTTP 403",
+  "audit-log": "HTTP 404",
+  "bans": "HTTP 404",
+  "invites": "HTTP 404",
+  "onboarding": "HTTP 404"
+ },
+ "preview": null,
+ "widget": null,
+ "audit_log_entries": null,
+ "channel_icons": [],
+ "role_icons": []
+}

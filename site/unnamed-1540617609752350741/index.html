@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#🧥-𝑼𝒏𝒊𝒇𝒐𝒓𝒎𝒔 — Server Of Kings</title>
+<style>
+:root{
+ --chat:#313338; --side:#2b2d31; --side-alt:#232428; --rail:#1e1f22; --float:#111214;
+ --textarea:#383a40; --bd:#3f4147; --bd-soft:#26272b;
+ --text:#dbdee1; --strong:#f2f3f5; --muted:#949ba4; --faint:#80848e;
+ --interactive:#b5bac1; --interactive-hover:#dbdee1; --interactive-active:#fff; --interactive-muted:#4e5058;
+ --brand:#5865f2; --brand-hover:#4752c4;
+ --mention-bg:rgba(88,101,242,.3); --mention-fg:#dee0fc; --link:#00a8fc;
+ --green:#23a55a; --red:#f23f43; --yellow:#f0b232; --scroll:#1a1b1e;
+ --msg-hover:#2e3035; --selected:#404249;
+ --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+ --mono:Consolas,'Andale Mono',monospace;
+ --radius-xs:3px; --radius-sm:4px; --radius-md:8px; --radius-lg:16px; --radius-round:50%;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--chat);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.375;overflow:hidden}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+::selection{background:var(--brand);color:#fff}
+::-webkit-scrollbar{width:16px;height:16px}
+::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:8px;border:4px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+.app{display:flex;height:100vh;overflow:hidden}
+.rail{flex:0 0 72px;background:var(--rail);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:8px}
+.rail .srv{width:48px;height:48px;border-radius:16px;background:var(--side);display:flex;align-items:center;
+ justify-content:center;overflow:hidden;transition:border-radius .15s;border:2px solid transparent;flex:0 0 auto}
+.rail .srv:hover{border-radius:14px}
+.rail .srv.active{border-radius:14px;border-color:var(--brand)}
+.rail .srv img{width:100%;height:100%;object-fit:cover}
+.rail .srv .ph{font-weight:600;color:#fff;font-size:18px}
+.rail .sep{width:32px;height:2px;background:#3f4147;border-radius:1px}
+.side{flex:0 0 240px;background:var(--side);display:flex;flex-direction:column;min-width:0;min-height:0}
+.side .guild{height:48px;display:flex;align-items:center;gap:8px;padding:0 16px;font-weight:600;font-size:15px;
+ color:var(--strong);border-bottom:1px solid var(--bd-soft);box-shadow:0 1px 0 rgba(0,0,0,.1);flex:0 0 auto;cursor:pointer}
+.side .guild:hover{background:rgba(78,80,88,.16)}
+.side .guild .gm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side .guild a{color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px;overflow:hidden}
+.side .cats{flex:1 1 auto;overflow-y:auto;padding:8px 8px 16px}
+.cat{margin-top:16px}
+.cat:first-child{margin-top:0}
+.cat .catHead{display:flex;align-items:center;gap:4px;padding:0 2px 0 0;color:var(--muted);font-size:12px;
+ font-weight:600;text-transform:uppercase;letter-spacing:.02em;cursor:pointer;user-select:none}
+.cat .catHead:hover{color:var(--interactive-hover)}
+.cat .catHead .chev{font-size:9px;transition:transform .12s;width:12px;text-align:center}
+.cat.closed .catHead .chev{transform:rotate(-90deg)}
+.cat.closed .items{display:none}
+.chrow{display:flex;align-items:center;gap:6px;height:34px;padding:0 8px;border-radius:var(--radius-sm);
+ color:var(--muted);font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.chrow:hover{background:rgba(78,80,88,.32);color:var(--interactive-hover);text-decoration:none}
+.chrow.cur{background:var(--selected);color:var(--interactive-active)}
+.chrow.lock{opacity:.55}
+.chrow .hash{color:var(--faint);font-size:18px;font-weight:400;width:18px;text-align:center;flex:0 0 auto}
+.chrow .nm{overflow:hidden;text-overflow:ellipsis}
+.chrow .badge{margin-left:auto;background:var(--rail);color:var(--interactive);font-size:11px;font-weight:600;
+ border-radius:8px;padding:1px 6px}
+.chat{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;background:var(--chat)}
+.chanhead{flex:0 0 auto;height:48px;display:flex;align-items:center;gap:8px;padding:0 16px;
+ border-bottom:1px solid var(--bd-soft);box-shadow:0 1px 0 rgba(0,0,0,.06);z-index:4}
+.chanhead .hash{color:var(--faint);font-size:22px}
+.chanhead h1{font-size:16px;font-weight:600;color:var(--strong);margin:0;white-space:nowrap}
+.chanhead .divider{width:1px;height:24px;background:var(--bd);margin:0 8px;flex:0 0 auto}
+.chanhead .topic{color:var(--muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto;min-width:0}
+.chanhead .tools{margin-left:auto;display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.chanhead .meta{color:var(--faint);font-size:12px;white-space:nowrap}
+.chanhead .search{background:var(--rail);border:0;border-radius:var(--radius-sm);color:var(--text);
+ font-size:14px;padding:5px 8px;width:180px;outline:none;transition:width .12s}
+.chanhead .search:focus{width:260px}
+.hbtn{background:transparent;border:0;color:var(--interactive);cursor:pointer;font-size:17px;padding:4px 7px;
+ border-radius:var(--radius-sm);line-height:1}
+.hbtn:hover{color:var(--interactive-hover);background:rgba(78,80,88,.32)}
+.hbtn.on{color:var(--interactive-active)}
+.scroller{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;position:relative;display:flex;flex-direction:column}
+.msgs{margin-top:auto;padding-bottom:24px;min-height:24px}
+.msg{position:relative;padding:2px 48px 2px 72px;min-height:22px}
+.msg:hover{background:var(--msg-hover)}
+.msg.groupStart{margin-top:17px}
+.msg .av{position:absolute;left:16px;top:2px;width:40px;height:40px;border-radius:var(--radius-round);
+ background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;
+ font-size:15px;overflow:hidden;cursor:pointer;object-fit:cover;user-select:none}
+.msg .av img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.msg .gutter{position:absolute;left:0;top:3px;width:56px;text-align:right;color:var(--faint);font-size:11px;display:none}
+.msg.groupStart .gutter,.msg:hover .gutter{display:block}
+.msg .gutter:hover{color:var(--interactive-hover)}
+.head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.head .name{color:var(--strong);font-weight:500;font-size:16px;cursor:pointer;display:inline-flex;
+ align-items:baseline;gap:0}
+.head .name:hover{text-decoration:underline}
+.dname{display:inline-flex;align-items:baseline}
+.clantag{color:var(--interactive);font-weight:600;font-size:13px;margin-left:4px;display:inline-flex;
+ align-items:center;gap:3px}
+.clantag img{width:14px;height:14px;border-radius:3px;vertical-align:-2px}
+.head .bot{background:var(--brand);color:#fff;font-size:10px;font-weight:600;border-radius:var(--radius-xs);
+ padding:1px 4px;text-transform:uppercase;position:relative;top:-1px}
+.head .ts{color:var(--faint);font-size:12px;font-weight:400}
+.head .edited{color:var(--faint);font-size:11px}
+.body{font-size:16px;line-height:1.375;white-space:pre-wrap;overflow-wrap:anywhere}
+.body .mention{background:var(--mention-bg);color:var(--mention-fg);border-radius:var(--radius-xs);
+ padding:0 2px;font-weight:500;cursor:pointer}
+a.body .mention,a .mention{text-decoration:none}
+.body .mention:hover{background:var(--brand);color:#fff}
+a.hbtn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.body code{background:var(--rail);font-family:var(--mono);font-size:.875rem;border-radius:var(--radius-xs);padding:0 2px}
+.body .spoiler{background:#000;border-radius:var(--radius-xs);color:transparent;cursor:pointer}
+.body .spoiler.open{background:#2b2d31;color:inherit}
+.body .emoji{width:22px;height:22px;vertical-align:-4px}
+.replyline{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:2px;position:relative;cursor:pointer}
+.replyline:hover{background:rgba(78,80,88,.24);border-radius:var(--radius-xs)}
+.msg.flash{animation:flashbg 1.8s ease-out}
+@keyframes flashbg{0%{background:rgba(88,101,242,.4)}100%{background:transparent}}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);background:var(--float);
+ border:1px solid var(--bd-soft);color:var(--text);padding:8px 14px;border-radius:var(--radius-md);font-size:13px;
+ opacity:0;pointer-events:none;transition:opacity .18s, transform .18s;z-index:70}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.replyline:before{content:'';position:absolute;left:-34px;top:8px;width:26px;height:10px;
+ border-left:2px solid var(--bd);border-top:2px solid var(--bd);border-radius:6px 0 0 0}
+.replyline .rAv{width:16px;height:16px;border-radius:var(--radius-round);object-fit:cover;background:var(--brand)}
+.replyline .rName{color:var(--interactive);font-weight:500;cursor:pointer}
+.replyline .rName:hover{color:var(--interactive-active)}
+.replyline .rTxt{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%}
+.att{margin-top:4px}
+.att img.media{max-width:400px;max-height:300px;border-radius:var(--radius-md);display:block;cursor:zoom-in}
+.att .filechip{display:inline-flex;align-items:center;gap:8px;background:var(--side);border:1px solid var(--bd-soft);
+ border-radius:var(--radius-md);padding:8px 10px;color:var(--link);font-size:14px;text-decoration:none}
+.att .filechip .sz{color:var(--muted);font-size:12px}
+.att .quar{color:var(--red);font-size:13px;font-style:italic}
+.embed{margin-top:4px;border-left:4px solid var(--brand);background:var(--side);border-radius:var(--radius-sm);
+ padding:8px 12px;max-width:520px;display:flow-root}
+.embed .etitle{color:var(--link);font-weight:600;font-size:16px}
+.embed .eprov{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.02em;margin-bottom:2px}
+.embed .edesc{font-size:14px;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.embed .efoot{color:var(--muted);font-size:12px;margin-top:4px;display:block}
+.embed .ethumb{float:right;max-width:80px;max-height:80px;border-radius:var(--radius-sm);margin:0 0 6px 10px}
+.embed img.media{max-width:400px;max-height:300px;border-radius:var(--radius-md);display:block;margin-top:6px}
+.reacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.react{display:inline-flex;align-items:center;gap:6px;background:var(--rail);border:1px solid transparent;
+ border-radius:var(--radius-md);padding:2px 8px;font-size:14px;color:var(--interactive);cursor:default}
+.react img{width:16px;height:16px}
+.sticker{margin-top:6px;display:inline-flex;align-items:center;gap:8px;background:var(--side);
+ border:1px solid var(--bd-soft);border-radius:var(--radius-md);padding:8px 12px;font-size:14px;color:var(--text)}
+.poll{margin-top:6px;max-width:430px;background:var(--side);border:1px solid var(--bd-soft);
+ border-radius:var(--radius-md);padding:10px 12px}
+.poll .pq{font-weight:600;color:var(--strong);margin-bottom:6px}
+.poll .prow{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:14px;color:var(--text)}
+.poll .prow img{width:18px;height:18px}
+.poll .pt{flex:1}
+.poll .pc{color:var(--faint);font-size:12px;white-space:nowrap}
+.poll .pfoot{color:var(--faint);font-size:12px;margin-top:6px}
+.fwd{background:var(--rail);border-left:4px solid var(--interactive-muted);border-radius:var(--radius-sm);
+ padding:8px 12px;margin-top:4px;max-width:520px}
+.fwd .fh{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.fwd .fname{font-weight:500;color:var(--strong);font-size:14px}
+.fwd .fbody{font-size:14px;color:var(--text);white-space:pre-wrap}
+.sysline{display:flex;align-items:center;gap:8px;padding:4px 16px 4px 72px;color:var(--muted);font-size:15px}
+.sysline .si{color:var(--green)}
+.daysep{display:flex;align-items:center;gap:8px;margin:16px 16px 4px 16px}
+.daysep:before,.daysep:after{content:'';height:1px;background:var(--bd-soft);flex:1}
+.daysep span{color:var(--faint);font-size:12px;font-weight:600;white-space:nowrap}
+.daysep.hitsep:before,.daysep.hitsep:after{background:var(--brand);opacity:.35}
+.jumpctx{color:var(--link);font-size:12px;white-space:nowrap;cursor:pointer;text-decoration:none}
+.jumpctx:hover{text-decoration:underline}
+.jump{position:fixed;right:24px;bottom:24px;display:none;flex-direction:column;gap:8px;z-index:6}
+.jump button{background:var(--rail);border:1px solid var(--bd-soft);color:var(--interactive);border-radius:var(--radius-lg);
+ padding:6px 12px;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.jump button:hover{color:var(--interactive-active);background:var(--side)}
+.mem{flex:0 0 240px;background:var(--side);overflow-y:auto;padding:0 8px 16px;display:none}
+.mem.open{display:block}
+.mem .mhead{padding:16px 8px 4px;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;
+ letter-spacing:.02em;display:flex;align-items:center;justify-content:space-between}
+.mclose{background:transparent;border:0;color:var(--interactive);cursor:pointer;font-size:13px;padding:2px 6px;
+ border-radius:var(--radius-sm);line-height:1}
+.mclose:hover{color:var(--interactive-active);background:rgba(78,80,88,.32)}
+.mgroup{padding:16px 8px 0;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.mrow{display:flex;align-items:center;gap:12px;padding:4px 8px;border-radius:var(--radius-sm);cursor:pointer}
+.mrow:hover{background:rgba(78,80,88,.32)}
+.mrow.off{opacity:.45}
+.mAv{width:32px;height:32px;border-radius:var(--radius-round);background:var(--brand);flex:0 0 auto;overflow:hidden;
+ display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:600}
+.mAv img{width:100%;height:100%;object-fit:cover}
+.mName{font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mTag{background:var(--brand);color:#fff;font-size:10px;font-weight:600;border-radius:var(--radius-xs);padding:0 4px;
+ flex:0 0 auto}
+.pop{position:fixed;z-index:50;width:300px;background:var(--float);border-radius:var(--radius-md);
+ box-shadow:0 8px 16px rgba(0,0,0,.25);overflow:hidden;font-size:14px;color:var(--text);display:none}
+.pop .pbanner{height:60px;background:var(--brand)}
+.pop .pbody{padding:0 12px 16px}
+.pop .pav{width:80px;height:80px;border-radius:var(--radius-round);border:6px solid var(--float);margin-top:-40px;
+ background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:600;
+ overflow:hidden}
+.pop .pav img{width:100%;height:100%;object-fit:cover}
+.pop .pname{font-weight:700;font-size:19px;color:var(--strong);margin-top:8px;overflow-wrap:anywhere}
+.pop .puser{color:var(--text);font-size:13px;margin-bottom:12px;word-break:break-all}
+.pop .pcard{background:var(--rail);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:14px}
+.pop .pcard h3{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.02em;color:var(--strong);font-weight:700}
+.pop .prow{display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-size:13px;color:var(--text)}
+.pop .prow span:first-child{color:var(--muted)}
+.pop .prow span:last-child{user-select:text;word-break:break-all;text-align:right}
+.pop h3.roleshead{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.02em;color:var(--muted);font-weight:600}
+.pop .proles{display:flex;flex-wrap:wrap;gap:6px}
+.pop .rchip{display:inline-flex;align-items:center;gap:6px;background:var(--side);border-radius:var(--radius-sm);
+ padding:2px 8px;font-size:12px;color:var(--text)}
+.pop .rdot{width:12px;height:12px;border-radius:var(--radius-round);background:var(--interactive-muted)}
+.lbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:60}
+.lbox.open{display:flex}
+.lbox img{max-width:92vw;max-height:92vh;border-radius:var(--radius-md)}
+.hidebtn{margin-left:auto;background:var(--rail);border:0;color:var(--interactive);cursor:pointer;font-size:16px;
+ padding:2px 8px;border-radius:var(--radius-sm);z-index:10}
+.hidebtn:hover{color:var(--interactive-hover)}
+.home{flex:1 1 auto;overflow-y:auto;background:var(--chat);padding:0 0 48px}
+.home .banner{height:130px;background:var(--side);display:flex;align-items:flex-end;gap:16px;
+ padding:0 28px 16px;border-bottom:1px solid var(--bd-soft)}
+.home .banner .gav{width:88px;height:88px;border-radius:var(--radius-round);background:var(--brand);overflow:hidden;
+ border:6px solid var(--chat);margin-bottom:-40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+ font-size:34px;font-weight:600;color:#fff}
+.home .banner .gav img{width:100%;height:100%;object-fit:cover}
+.home .banner h1{font-size:24px;margin:0 0 4px;color:var(--strong)}
+.home .banner .sub{color:var(--muted);font-size:13px}
+.home .inner{max-width:1000px;margin:56px auto 0;padding:0 28px}
+.home h2{font-size:12px;text-transform:uppercase;letter-spacing:.02em;color:var(--muted);margin:28px 0 8px}
+.home table{width:100%;border-collapse:collapse;font-size:14px}
+.home td,.home th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--bd-soft)}
+.home th{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.home td.n{text-align:right;font-variant-numeric:tabular-nums}
+.home .muted{color:var(--muted);font-size:13px}
+.home .catrow td{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;
+ letter-spacing:.02em;padding-top:14px;border-bottom-color:transparent}
+.home .cards{display:flex;gap:12px;flex-wrap:wrap}
+.home .card{background:var(--side);border-radius:var(--radius-md);padding:14px 16px;min-width:150px}
+.home .card .big{font-size:24px;font-weight:600;color:var(--strong)}
+.home .card .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.02em}
+@media (max-width:1100px){.mem{position:absolute;right:0;top:0;bottom:0;z-index:8;box-shadow:-8px 0 16px rgba(0,0,0,.25)}}
+@media (max-width:860px){
+ .rail{display:none}
+ .side{position:absolute;left:0;top:0;bottom:0;z-index:9;transform:translateX(-100%);transition:transform .15s;
+  box-shadow:8px 0 16px rgba(0,0,0,.25)}
+ .side.open{transform:none}
+ .msg{padding-right:16px}
+}
+.mbtn{display:inline-flex}
+</style></head>
+<body class="">
+<div class="app"><nav class="rail"><a class="srv" href="../../index.html" title="Server Of Kings — server home"><img src="../assets/server_icon_8508bb837641.png" alt=""></a></nav><aside class="side"><div class="guild"><a href="../../index.html"><span class="gm">Server Of Kings</span></a></div><div class="cats"><div class="cat"><div class="catHead"><span class="chev">▾</span>&lt;&lt; 𝑰𝒏𝒕𝒓𝒐𝒅𝒖𝒄𝒕𝒊𝒐𝒏 𝑻𝒐 𝑻𝒉𝒆 𝑺𝒆𝒓𝒗𝒆𝒓 &gt;&gt;</div><div class="items"><a class="chrow" href="../unnamed-1525533058483097791/index.html"><span class="hash">#</span><span class="nm">✪-ɪɴᴛʀᴏᴅᴜᴄᴛɪᴏɴ</span><span class="badge">93</span></a><a class="chrow" href="../unnamed-1525533058483097792/index.html"><span class="hash">#</span><span class="nm">✪-ɢᴏᴏᴅʟᴜᴄᴋ</span></a><a class="chrow" href="../s-1525533058483097793/index.html"><span class="hash">#</span><span class="nm">✪-ʀᴇɢᴜʟᴀᴛɪᴏɴs-ʙᴏᴀʀᴅ</span></a></div></div><div class="cat"><div class="catHead"><span class="chev">▾</span>&lt;&lt; 𝑰𝒎𝒑𝒐𝒓𝒕𝒂𝒏𝒕 &gt;&gt;</div><div class="items"><a class="chrow" href="../unnamed-1525533058483097796/index.html"><span class="hash">#</span><span class="nm">🍷-𝑨𝒏𝒏𝒐𝒖𝒏𝒄𝒆𝒎𝒆𝒏𝒕𝒔</span><span class="badge">190</span></a><a class="chrow" href="../unnamed-1525533058483097797/index.html"><span class="hash">#</span><span class="nm">🔪-𝑹𝒂𝒊𝒅-𝑨𝒍𝒆𝒓𝒕</span><span class="badge">44</span></a><a class="chrow" href="../unnamed-1525533058483097798/index.html"><span class="hash">#</span><span class="nm">🔪-𝑹𝒂𝒊𝒅-𝑹𝒆𝒔𝒖𝒍𝒕</span><span class="badge">45</span></a><a class="chrow" href="../unnamed-1525533058483097799/index.html"><span class="hash">#</span><span class="nm">⏳-𝑰𝒎𝒑𝒐𝒓𝒕𝒂𝒏𝒕-𝑸𝒖𝒆𝒔𝒕</span></a><a class="chrow" href="../unnamed-1525533105014702211/index.html"><span class="hash">#</span><span class="nm">🗡️-𝑻𝒂𝒓𝒈𝒆𝒕-𝑨𝒍𝒆𝒓𝒕</span></a><a class="chrow" href="../unnamed-1538532713009651764/index.html"><span class="hash">#</span><span class="nm">📃-𝑷𝒓𝒐𝒎𝒐𝒕𝒊𝒐𝒏-𝑫𝒆𝒎𝒐𝒕𝒊𝒐𝒏𝒔</span></a><a class="chrow" href="../unnamed-1539669403002601503/index.html"><span class="hash">#</span><span class="nm">📝-𝑬𝒗𝒆𝒏𝒕𝒔-𝑰𝒏𝒇𝒐𝒓𝒎𝒂𝒕𝒊𝒐𝒏</span><span class="badge">3</span></a></div></div><div class="cat"><div class="catHead"><span class="chev">▾</span>&gt;&gt; 𝑲𝒊𝒍𝒍 𝑶𝒏 𝑺𝒊𝒈𝒉𝒕 &lt;&lt;</div><div class="items"><a class="chrow" href="../unnamed-1525533059003322379/index.html"><span class="hash">#</span><span class="nm">⚔️-𝑬𝒏𝒆𝒎𝒊𝒆𝒔</span><span class="badge">1</span></a><a class="chrow" href="../unnamed-1540617522322083900/index.html"><span class="hash">#</span><span class="nm">🛡️-𝑪𝒐𝒂𝒍𝒊𝒕𝒊𝒐𝒏</span></a><span class="chrow cur"><span class="hash">#</span><span class="nm">🧥-𝑼𝒏𝒊𝒇𝒐𝒓𝒎𝒔</span><span class="badge">1</span></span><a class="chrow" href="../unnamed-1540617694167044096/index.html"><span class="hash">#</span><span class="nm">🔪-𝑲𝒐𝒔</span></a><a class="chrow" href="../unnamed-1543129274868039680/index.html"><span class="hash">#</span><span class="nm">🥶-𝑨𝒍𝒕-𝑹𝒂𝒊𝒅𝒊𝒏𝒈-𝑨𝒄𝒄𝒔</span></a><a class="chrow" href="../unnamed-1543133965999669388/index.html"><span class="hash">#</span><span class="nm">🧐-𝑨𝒍𝒕𝒔-𝑼𝒏𝒊𝒇𝒐𝒓𝒎</span></a></div></div><div class="cat"><div class="catHead"><span class="chev">▾</span>&gt;&gt; 𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔 &lt;&lt;</div><div class="items"><a class="chrow" href="../unnamed-1540612119446159390/index.html"><span class="hash">#</span><span class="nm">🍻-𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔</span><span class="badge">45615</span></a><a class="chrow" href="../unnamed-1525533059003322382/index.html"><span class="hash">#</span><span class="nm">📸-𝑴𝒆𝒅𝒊𝒂</span><span class="badge">251</span></a><a class="chrow" href="../unnamed-1525533059003322383/index.html"><span class="hash">#</span><span class="nm">⚡𝑩𝒐𝒕-𝑪𝒎𝒅𝒔</span><span class="badge">193</span></a><a class="chrow lock" href="../unnamed-1540620116688109649/index.html" title="not viewable with this account"><span class="hash">🔒</span><span class="nm">⚡-𝑺𝒖𝒈𝒈𝒆𝒔𝒕𝒊𝒐𝒏𝒔</span></a><a class="chrow" href="../unnamed-1525533059003322384/index.html"><span class="hash">#</span><span class="nm">🥶-𝐅𝐮𝐧</span><span class="badge">1250</span></a></div></div><div class="cat"><div class="catHead"><span class="chev">▾</span>&gt;&gt; 𝑽𝒐𝒊𝒄𝒆 𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔 &lt;&lt;</div><div class="items"><a class="chrow" href="../unnamed-1540619782666321930/index.html"><span class="hash">#</span><span class="nm">𝑹𝒂𝒊𝒅𝒔</span></a><a class="chrow" href="../1-1525533059481600197/index.html"><span class="hash">#</span><span class="nm">𝑪𝒐𝒎𝒍𝒊𝒏𝒌 1</span><span class="badge">1199</span></a><a class="chrow" href="../2-1525533060026601482/index.html"><span class="hash">#</span><span class="nm">𝑪𝒐𝒎𝒍𝒊𝒏𝒌 2</span><span class="badge">16</span></a></div></div><div class="cat"><div class="catHead"><span class="chev">▾</span>HR</div><div class="items"><a class="chrow" href="../chat-1534946040069754902/index.html"><span class="hash">#</span><span class="nm">chat</span></a><a class="chrow" href="../announcements-1534946093929070773/index.html"><span class="hash">#</span><span class="nm">announcements</span></a></div></div><div class="cat"><div class="catHead"><span class="chev">▾</span>Threads</div><div class="items"><a class="chrow" href="../i-want-awna-1532322068111163413/index.html"><span class="hash">🧵</span><span class="nm">I want awna</span><span class="badge">5</span></a><a class="chrow" href="../hahahah-1545782311365120082/index.html"><span class="hash">🧵</span><span class="nm">Hahahah</span></a><a class="chrow" href="../hahahah-1545829388963291167/index.html"><span class="hash">🧵</span><span class="nm">Hahahah</span></a><a class="chrow" href="../uniform-1543148815480266912/index.html"><span class="hash">🧵</span><span class="nm">UNIFORM</span><span class="badge">4</span></a><a class="chrow" href="../kill-nev-1546500434150035456/index.html"><span class="hash">🧵</span><span class="nm">Kill nev</span><span class="badge">1</span></a><a class="chrow" href="../unnamed-1546498253581717635/index.html"><span class="hash">🧵</span><span class="nm">.̵̥̈́͛̚.̴̯̀̾͛.̵͕̈́͊̚.̶̪͒̐͠.̵̥̈́͛̚.̴̯̀̾͛...........͕̚.̶̪͒̐͠...͕̈́͊̚.̶͒͠....̪͒̐.̵̈́.̯̾͛.̵..̥.̴̀..̪.̵</span><span class="badge">2</span></a><a class="chrow" href="../67-1546046329116172378/index.html"><span class="hash">🧵</span><span class="nm">67</span><span class="badge">2</span></a><a class="chrow" href="../unnamed-1548708273958690948/index.html"><span class="hash">🧵</span><span class="nm">✅ ✅ ✅ ✅ ✅ ✅✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅</span><span class="badge">6</span></a></div></div></div></aside><main class="chat">
+<header class="chanhead"><a class="hbtn" href="../../index.html" title="server home — the channel list and every archive page">⌂</a><span class="hash">#</span><h1>🧥-𝑼𝒏𝒊𝒇𝒐𝒓𝒎𝒔</h1>
+
+<div class="tools"><span class="meta" id="count"></span><input class="search" id="q" placeholder="Search" autocomplete="off"><button class="hbtn mbtn" id="mem-toggle" title="show/hide the member list">👥</button></div>
+</header>
+<div class="scroller" id="scroller"><div class="msgs" id="m"></div></div>
+<footer class="jump" id="jump"><button id="jump-old">↑ older</button><button id="jump-new">↓ newest</button></footer>
+</main><aside class="mem" id="memlist"></aside></div>
+<div class="pop" id="pop"></div>
+<div class="lbox" id="lightbox"><img alt=""></div>
+<script id="archive-data" type="application/json">{"page": "channel", "guild": {"name": "Server Of Kings", "id": "1525533054574002246", "icon": "assets/server_icon_8508bb837641.png", "description": null}, "header": {"channel_id": "1540617609752350741", "channel_name": "🧥-𝑼𝒏𝒊𝒇𝒐𝒓𝒎𝒔", "channel_type": 0, "topic": null, "parent_id": "1525533059003322378", "guild_id": "1525533054574002246", "guild_name": "Server Of Kings", "message_count": 1, "first_message": "2026-08-29T06:50:17.435000+00:00", "last_message": "2026-08-29T06:50:17.435000+00:00", "attachments_downloaded": 0, "note": "payloads verbatim from Discord REST; _local/_local_avatar are archive-local paths"}, "messages": [{"type": 0, "content": "SHIRT-114452921837171\nPANTS-139868809943649", "mentions": [], "mention_roles": [], "attachments": [], "embeds": [], "timestamp": "2026-08-29T06:50:17.435000+00:00", "edited_timestamp": null, "flags": 0, "components": [], "id": "1543150784731160657", "channel_id": "1540617609752350741", "author": {"id": "1386691432760348724", "username": "monesy_13", "avatar": "ece995fd003701b8b6f9fb223aef33af", "discriminator": "0", "public_flags": 0, "flags": 0, "banner": null, "accent_color": null, "global_name": "m0nesY", "avatar_decoration_data": {"asset": "a_b524fa5c3f80fbea3865a5d130ab5aef", "sku_id": "1352407446282440704", "expires_at": null}, "collectibles": null, "display_name_styles": null, "vad_colors": null, "banner_color": null, "clan": null, "primary_guild": null, "_local_avatar": "../assets/7fd29adbea67_1386691432760348724.png"}, "pinned": false, "mention_everyone": false, "tts": false}], "channels": {"1525533058483097790": "<< 𝑰𝒏𝒕𝒓𝒐𝒅𝒖𝒄𝒕𝒊𝒐𝒏 𝑻𝒐 𝑻𝒉𝒆 𝑺𝒆𝒓𝒗𝒆𝒓 >>", "1525533058483097791": "✪-ɪɴᴛʀᴏᴅᴜᴄᴛɪᴏɴ", "1525533058483097792": "✪-ɢᴏᴏᴅʟᴜᴄᴋ", "1525533058483097793": "✪-ʀᴇɢᴜʟᴀᴛɪᴏɴs-ʙᴏᴀʀᴅ", "1525533058483097795": "<< 𝑰𝒎𝒑𝒐𝒓𝒕𝒂𝒏𝒕 >>", "1525533058483097796": "🍷-𝑨𝒏𝒏𝒐𝒖𝒏𝒄𝒆𝒎𝒆𝒏𝒕𝒔", "1525533058483097797": "🔪-𝑹𝒂𝒊𝒅-𝑨𝒍𝒆𝒓𝒕", "1525533058483097798": "🔪-𝑹𝒂𝒊𝒅-𝑹𝒆𝒔𝒖𝒍𝒕", "1525533058483097799": "⏳-𝑰𝒎𝒑𝒐𝒓𝒕𝒂𝒏𝒕-𝑸𝒖𝒆𝒔𝒕", "1525533059003322378": ">> 𝑲𝒊𝒍𝒍 𝑶𝒏 𝑺𝒊𝒈𝒉𝒕 <<", "1525533059003322379": "⚔️-𝑬𝒏𝒆𝒎𝒊𝒆𝒔", "1525533059003322380": ">> 𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔 <<", "1525533059003322382": "📸-𝑴𝒆𝒅𝒊𝒂", "1525533059003322383": "⚡𝑩𝒐𝒕-𝑪𝒎𝒅𝒔", "1525533059003322384": "🥶-𝐅𝐮𝐧", "1525533059481600196": ">> 𝑽𝒐𝒊𝒄𝒆 𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔 <<", "1525533059481600197": "𝑪𝒐𝒎𝒍𝒊𝒏𝒌 1", "1525533060026601482": "𝑪𝒐𝒎𝒍𝒊𝒏𝒌 2", "1525533105014702211": "🗡️-𝑻𝒂𝒓𝒈𝒆𝒕-𝑨𝒍𝒆𝒓𝒕", "1534946008302096566": "HR", "1534946040069754902": "chat", "1534946093929070773": "announcements", "1538532713009651764": "📃-𝑷𝒓𝒐𝒎𝒐𝒕𝒊𝒐𝒏-𝑫𝒆𝒎𝒐𝒕𝒊𝒐𝒏𝒔", "1539669403002601503": "📝-𝑬𝒗𝒆𝒏𝒕𝒔-𝑰𝒏𝒇𝒐𝒓𝒎𝒂𝒕𝒊𝒐𝒏", "1540612119446159390": "🍻-𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔", "1540617522322083900": "🛡️-𝑪𝒐𝒂𝒍𝒊𝒕𝒊𝒐𝒏", "1540617609752350741": "🧥-𝑼𝒏𝒊𝒇𝒐𝒓𝒎𝒔", "1540617694167044096": "🔪-𝑲𝒐𝒔", "1540619782666321930": "𝑹𝒂𝒊𝒅𝒔", "1540620116688109649": "⚡-𝑺𝒖𝒈𝒈𝒆𝒔𝒕𝒊𝒐𝒏𝒔", "1543129274868039680": "🥶-𝑨𝒍𝒕-𝑹𝒂𝒊𝒅𝒊𝒏𝒈-𝑨𝒄𝒄𝒔", "1543133965999669388": "🧐-𝑨𝒍𝒕𝒔-𝑼𝒏𝒊𝒇𝒐𝒓𝒎"}, "users": {"1386691432760348724": "m0nesY"}, "memberinfo": {"1209730439795707966": {"n": "xXHughZXx", "u": "wodmdiengiwmiende8ri_t8enewle.", "av": "assets/2c6ef76b9606_1209730439795707966.png", "c": 2044, "r": [{"n": "GrandMaster", "c": 2044}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Handsome", "c": 15277667}], "j": "2026-08-31T07:03:35.987000+00:00", "a": "2024-02-21T05:16:52Z", "f": "2026-08-15T04:19:39.082000+00:00", "l": "2026-09-25T23:54:37.400000+00:00", "mi": 7997, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "Sols", "cb": "assets/clan_c3907146e8c1.png"}, "897890698282561646": {"n": "xXNev3RXx", "u": "neverroblox", "av": "assets/73f88a28c317_897890698282561646.png", "c": 16711680, "r": [{"n": "「👑」Owner", "c": 16711680}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-07-21T10:23:38.530000+00:00", "a": "2021-10-13T16:57:04Z", "f": "2026-07-21T10:23:38.723000+00:00", "l": "2026-10-12T12:02:15.920000+00:00", "mi": 5513, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1117347787512758294": {"n": "awnais3", "u": "awnais3", "av": "assets/aed5f0e7d82a_1117347787512758294.png", "c": 0, "r": [], "j": "", "a": "2023-06-11T07:01:11Z", "f": "2026-07-27T12:16:22.334000+00:00", "l": "2026-09-23T10:56:02.689000+00:00", "mi": 5036, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": ">ᆺ<", "cb": "assets/clan_ec60c5e6d1f1.png"}, "1375082770736353281": {"n": "Ucuk", "u": "legendary_beagle_98019", "av": "assets/b1b5e5956385_1375082770736353281.png", "c": 204911, "r": [{"n": "Owner", "c": 204911}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-11T16:03:43.903000+00:00", "a": "2025-05-22T12:08:00Z", "f": "2026-07-11T17:53:11.075000+00:00", "l": "2026-09-28T11:27:24.157000+00:00", "mi": 3442, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "TSA", "cb": "assets/clan_7932371bebba.png"}, "884794512961044481": {"n": "Folk", "u": "your_friend3231", "av": "assets/53e6fadc525d_884794512961044481.png", "c": 16711680, "r": [{"n": "「👑」Owner", "c": 16711680}], "j": "2026-08-17T10:06:23.190000+00:00", "a": "2021-09-07T13:37:30Z", "f": "2026-08-17T10:06:23.318000+00:00", "l": "2026-10-12T12:00:27.279000+00:00", "mi": 3358, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1267076714068967528": {"n": "Greenmelon", "u": "bin05620", "av": "assets/01ffeb789036_1267076714068967528.png", "c": 10181046, "r": [{"n": "Core Knight", "c": 10181046}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-08-16T02:40:41.694000+00:00", "a": "2024-07-28T11:10:29Z", "f": "2026-08-16T02:40:42.918000+00:00", "l": "2026-10-12T13:45:51.317000+00:00", "mi": 3248, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "Sols", "cb": "assets/clan_c3907146e8c1.png", "fid": 15, "eid": 7, "fc": [71424, 207105, 612353, 766464, 65285]}, "780152454695223316": {"n": "Ur Owner", "u": "69kanan", "av": "assets/6c11354acd4e_780152454695223316.png", "c": 204911, "r": [{"n": "Owner", "c": 204911}, {"n": "Slave", "c": 1184274}], "j": "2026-07-27T12:41:31.390000+00:00", "a": "2020-11-22T19:27:19Z", "f": "2026-07-27T12:41:31.828000+00:00", "l": "2026-10-12T14:19:16.781000+00:00", "mi": 2838, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "𝙴𝚂", "cb": "assets/clan_bc2f7685eed9.png"}, "1386522748867711188": {"n": "亗  🇾 🇺 🇹 🇦 亗  ✞ঔৣ ᎶᎧᎶᎧᎦ ঔৣ✞", "u": "giabao07057", "av": "assets/447b3d4dc05d_1386522748867711188.png", "c": 0, "r": [], "j": "", "a": "2025-06-23T01:46:23Z", "f": "2026-08-26T10:56:50.554000+00:00", "l": "2026-09-04T10:09:46.222000+00:00", "mi": 2200, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "VBL", "cb": "assets/clan_ec2515fd2a66.png"}, "1205421851619233848": {"n": "Doux Larper", "u": "wizard.in.the.mirror", "av": "assets/66356d760eeb_1205421851619233848.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}, {"n": "Handsome", "c": 15277667}], "j": "2026-09-02T08:53:55.620000+00:00", "a": "2024-02-09T07:56:05Z", "f": "2026-08-22T15:30:29.314000+00:00", "l": "2026-09-24T11:11:46.731000+00:00", "mi": 1973, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "HZ", "cb": "assets/clan_6ed907032e3a.png"}, "1508520345953374359": {"n": "𝚃𝚑𝚎 𝙸𝚖𝚙𝚞𝚕𝚜𝚎", "u": "zimplvse", "av": "", "c": 1184274, "r": [{"n": "Slave", "c": 1184274}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-08-22T16:41:19.745000+00:00", "a": "2026-05-25T17:21:17Z", "f": "2026-08-16T15:30:59.857000+00:00", "l": "2026-10-10T12:40:11.447000+00:00", "mi": 1793, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1529845975261249718": {"n": "Desync monster", "u": "caesargoated2", "av": "assets/720194ea22e7_1529845975261249718.png", "c": 11342935, "r": [{"n": "Battle Master", "c": 11342935}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-08-01T11:59:21.100000+00:00", "a": "2026-07-23T13:41:43Z", "f": "2026-08-01T11:59:22.903000+00:00", "l": "2026-09-13T14:10:20.386000+00:00", "mi": 1184, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1531877331059085521": {"n": "YUTA", "u": "rolando096128", "av": "assets/0bde20188dc5_1531877331059085521.png", "c": 0, "r": [], "j": "", "a": "2026-07-29T04:13:36Z", "f": "2026-08-28T12:01:47.852000+00:00", "l": "2026-09-04T09:52:53.366000+00:00", "mi": 1021, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "CNFG", "cb": "assets/clan_133213d8c1bf.png"}, "709948287804768286": {"n": "Flame", "u": "flame_ender", "av": "assets/a1c4464ab1f1_709948287804768286.png", "c": 16711680, "r": [{"n": "「👑」Owner", "c": 16711680}, {"n": "Retired Buns", "c": 16390}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-07-19T05:37:47.487000+00:00", "a": "2020-05-13T02:01:02Z", "f": "2026-07-19T05:37:47.647000+00:00", "l": "2026-10-12T12:00:39.948000+00:00", "mi": 957, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "EPR", "cb": "assets/clan_ba95480f7a85.png"}, "1153372250297356419": {"n": "𝟒𝟗𝟏𝕰𝕵𝕱", "u": "491ejf", "av": "assets/35ec6ed6853f_1153372250297356419.png", "c": 14745629, "r": [{"n": "Warlord", "c": 14745629}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-19T05:24:16.615000+00:00", "a": "2023-09-18T16:49:33Z", "f": "2026-07-19T05:24:16.979000+00:00", "l": "2026-10-12T14:23:48.641000+00:00", "mi": 914, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1550926511236849717": {"n": "Tazzy obsession", "u": "iamyournicefriend", "av": "assets/8ef8d121b0d4_1550926511236849717.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-09-19T21:27:40.471000+00:00", "a": "2026-09-19T17:48:15Z", "f": "2026-09-19T21:27:40.683000+00:00", "l": "2026-10-12T14:15:39.985000+00:00", "mi": 851, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1498624251127926915": {"n": "Shum???", "u": "shumiyayyay_606768", "av": "assets/62303be7f02b_1498624251127926915.png", "c": 0, "r": [], "j": "", "a": "2026-04-28T09:57:44Z", "f": "2026-07-15T14:11:23.777000+00:00", "l": "2026-09-13T07:43:32.752000+00:00", "mi": 644, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "412347553141751808": {"n": "Jockie Music (2)", "u": "Jockie Music (2)", "av": "assets/c16e8748678b_412347553141751808.png", "c": 1184274, "r": [{"n": "Slave", "c": 1184274}, {"n": "Jockie Music (2)", "c": 0}], "j": "2026-08-06T16:05:53.102000+00:00", "a": "2018-02-11T20:41:57Z", "f": "2026-08-06T16:05:53.199000+00:00", "l": "2026-09-04T03:56:48.137000+00:00", "mi": 564, "bot": true, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1353912831720034356": {"n": "Sanchez", "u": ".ogsanchez", "av": "assets/329e238073c2_1353912831720034356.png", "c": 0, "r": [], "j": "", "a": "2025-03-25T02:06:13Z", "f": "2026-08-22T14:15:22.281000+00:00", "l": "2026-08-24T13:48:38.774000+00:00", "mi": 540, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1322830370483474487": {"n": "Mossrala ucuk slave", "u": "mossrala", "av": "assets/7cc232a3e54c_1322830370483474487.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-09-22T09:42:44.132000+00:00", "a": "2024-12-29T07:35:37Z", "f": "2026-08-30T11:18:32.233000+00:00", "l": "2026-10-12T11:53:16.694000+00:00", "mi": 522, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": "", "fid": 3, "eid": 1}, "1230149118710779914": {"n": "Phoenix", "u": "Phoenix", "av": "assets/8afe8e924207_1230149118710779914.png", "c": 1184274, "r": [{"n": "Slave", "c": 1184274}, {"n": "Phoenix", "c": 0}], "j": "2026-08-06T16:06:12.895000+00:00", "a": "2024-04-17T13:33:24Z", "f": "2026-08-06T16:06:14.190000+00:00", "l": "2026-10-01T12:39:46.435000+00:00", "mi": 518, "bot": true, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1494933611445751829": {"n": "Desileader_virajijj", "u": "viraj01268", "av": "", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-09-05T06:18:46.384000+00:00", "a": "2026-04-18T05:32:27Z", "f": "2026-09-05T06:18:46.568000+00:00", "l": "2026-10-10T13:38:54.352000+00:00", "mi": 448, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1386691432760348724": {"n": "ginga my dog", "u": "monesy_13", "av": "assets/7fd29adbea67_1386691432760348724.png", "c": 1184274, "r": [{"n": "Slave", "c": 1184274}, {"n": "Retired Buns", "c": 16390}, {"n": "Mvp", "c": 4053}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-13T09:37:15.710000+00:00", "a": "2025-06-23T12:56:41Z", "f": "2026-07-13T09:37:15.881000+00:00", "l": "2026-10-12T14:14:48.401000+00:00", "mi": 447, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1446010791525617715": {"n": "Yzz", "u": "kiwimannsmartz", "av": "assets/83f555d7d6eb_1446010791525617715.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-17T01:47:15.673000+00:00", "a": "2025-12-04T05:30:38Z", "f": "2026-07-17T03:46:30.506000+00:00", "l": "2026-09-16T03:49:34.116000+00:00", "mi": 407, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1384425757190783039": {"n": "void_ain", "u": "void_ain", "av": "assets/984dd3da2ae9_1384425757190783039.png", "c": 0, "r": [], "j": "", "a": "2025-06-17T06:53:41Z", "f": "2026-08-09T09:11:52.608000+00:00", "l": "2026-08-09T11:33:51.564000+00:00", "mi": 275, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "GAZA", "cb": "assets/clan_a37bf4789bbb.png"}, "1285188145440362580": {"n": "Waz_ED", "u": "mahadi_abir", "av": "assets/1817a535fea0_1285188145440362580.png", "c": 4053, "r": [{"n": "Mvp", "c": 4053}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-07-28T08:52:07.431000+00:00", "a": "2024-09-16T10:38:51Z", "f": "2026-07-28T08:52:07.570000+00:00", "l": "2026-09-27T12:36:10.922000+00:00", "mi": 251, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1527329053273493527": {"n": "BしѺѺの尺ﾑ乙乇  XD", "u": "bloodrazexd", "av": "assets/77287d49a87d_1527329053273493527.png", "c": 15277667, "r": [{"n": "Greatest Loyalist oat", "c": 15277667}, {"n": "Trial Knight", "c": 10038562}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-19T07:33:27.464000+00:00", "a": "2026-07-16T15:00:22Z", "f": "2026-07-19T07:33:27.695000+00:00", "l": "2026-10-11T15:09:09.507000+00:00", "mi": 178, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "𝙴𝚂", "cb": "assets/clan_bc2f7685eed9.png"}, "1491732757284393062": {"n": "Pepper", "u": "vvanym", "av": "assets/65af2a756320_1491732757284393062.png", "c": 11342935, "r": [{"n": "Battle Master", "c": 11342935}, {"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-07-20T13:56:12.697000+00:00", "a": "2026-04-09T09:33:24Z", "f": "2026-07-20T13:56:12.823000+00:00", "l": "2026-09-13T13:40:52.164000+00:00", "mi": 178, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "𝙴𝚂", "cb": "assets/clan_bc2f7685eed9.png"}, "1397192564003704852": {"n": "𝚅𝚎𝚐𝙲𝚞𝚛𝚛𝚢", "u": "indian014", "av": "assets/7efda10e1155_1397192564003704852.png", "c": 0, "r": [], "j": "", "a": "2025-07-22T12:24:25Z", "f": "2026-07-20T05:04:26.306000+00:00", "l": "2026-09-12T06:42:01.846000+00:00", "mi": 146, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "854254208847839262": {"n": "Void_ain", "u": "void_handsome", "av": "assets/aa56539c829a_854254208847839262.png", "c": 0, "r": [], "j": "", "a": "2021-06-15T07:01:14Z", "f": "2026-08-08T05:11:07.121000+00:00", "l": "2026-08-10T05:52:13.111000+00:00", "mi": 127, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "944016826751389717": {"n": "Lara✨", "u": "Lara✨", "av": "assets/6380a57d14db_944016826751389717.png", "c": 1184274, "r": [{"n": "Lara✨", "c": 0}, {"n": "Slave", "c": 1184274}], "j": "2026-07-30T12:42:28.438000+00:00", "a": "2022-02-17T23:45:50Z", "f": "2026-07-30T12:42:28.530000+00:00", "l": "2026-09-13T08:45:55.167000+00:00", "mi": 118, "bot": true, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1140487641775747112": {"n": "Oefkiseisid", "u": "wid8f9skekdidif.", "av": "assets/750bcbcfe078_1140487641775747112.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-09-05T03:56:10.026000+00:00", "a": "2023-08-14T03:30:43Z", "f": "2026-09-05T03:56:10.145000+00:00", "l": "2026-09-24T07:06:18.387000+00:00", "mi": 83, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1121774401164148757": {"n": "🔥DRAGON_RYUGA🔥", "u": "killerdog_gamertamil", "av": "assets/f8e11beed4d0_1121774401164148757.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-09-03T11:41:49.987000+00:00", "a": "2023-06-23T12:10:58Z", "f": "2026-09-03T11:41:51.230000+00:00", "l": "2026-10-10T09:43:43.972000+00:00", "mi": 82, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "BLR", "cb": "assets/clan_d5ee13c5f59c.png"}, "235148962103951360": {"n": "Carl-bot", "u": "Carl-bot", "av": "assets/7df86cdc1f61_235148962103951360.png", "c": 1184274, "r": [{"n": "Slave", "c": 1184274}, {"n": "carl-bot", "c": 0}], "j": "2026-08-06T16:04:59.790000+00:00", "a": "2016-10-10T21:18:01Z", "f": "2026-08-06T16:05:00.552000+00:00", "l": "2026-09-24T06:14:43.510000+00:00", "mi": 82, "bot": true, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "698142490775257119": {"n": "volc", "u": "volc.1", "av": "assets/b00763b22458_698142490775257119.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-09-18T17:00:34.584000+00:00", "a": "2020-04-10T12:09:00Z", "f": "2026-09-18T17:00:34.780000+00:00", "l": "2026-10-07T15:48:53.165000+00:00", "mi": 74, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "hix", "cb": "assets/clan_c08ecb1ef98d.png", "fid": 6, "eid": 3, "fc": [14737632]}, "1468545584817377361": {"n": "Boomfarter99", "u": "boomfarter99", "av": "assets/ceeadb805624_1468545584817377361.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-09-11T14:15:34.798000+00:00", "a": "2026-02-04T09:55:51Z", "f": "2026-09-11T14:15:34.953000+00:00", "l": "2026-09-27T11:59:10.771000+00:00", "mi": 73, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1530336622099300430": {"n": "𝓞𝔂𝓮𝓷𝓰𝓻𝓮𝓪𝓽", "u": "oyengreat", "av": "assets/111f9206391a_1530336622099300430.png", "c": 0, "r": [], "j": "", "a": "2026-07-24T22:11:22Z", "f": "2026-08-31T11:33:05.447000+00:00", "l": "2026-09-02T00:30:27.500000+00:00", "mi": 70, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1063863687271698523": {"n": "༺ღ༒ ιт'z.мє_уυкι ༒ღ༻", "u": "yuki.is_here17", "av": "assets/cee9a10dc5d5_1063863687271698523.png", "c": 0, "r": [], "j": "", "a": "2023-01-14T16:54:28Z", "f": "2026-09-02T12:24:59.331000+00:00", "l": "2026-09-02T13:23:54.917000+00:00", "mi": 69, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1324530642196631626": {"n": "Jxne", "u": "yamizuki_._02918", "av": "assets/195725b1d7e6_1324530642196631626.png", "c": 0, "r": [], "j": "", "a": "2025-01-03T00:11:53Z", "f": "2026-07-12T07:59:31.296000+00:00", "l": "2026-10-01T09:45:56.743000+00:00", "mi": 67, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "853175484916301826": {"n": "LordAkuma", "u": "1bnam19061", "av": "assets/07b04bb19d7a_853175484916301826.png", "c": 0, "r": [], "j": "", "a": "2021-06-12T07:34:46Z", "f": "2026-08-09T14:16:29.026000+00:00", "l": "2026-08-31T01:28:02.933000+00:00", "mi": 58, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1286957983820943423": {"n": "lulu 😃", "u": "verynoobplayer123_15425", "av": "assets/21611691d573_1286957983820943423.png", "c": 16771840, "r": [{"n": "SSS Tier 👑", "c": 16771840}, {"n": "GrandMaster", "c": 2044}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-13T08:39:04.696000+00:00", "a": "2024-09-21T07:51:33Z", "f": "2026-07-13T08:39:04.861000+00:00", "l": "2026-09-13T12:07:55.849000+00:00", "mi": 55, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1242096293808050209": {"n": "Saturn", "u": "ryanzirz.", "av": "assets/f2fc1e12d88e_1242096293808050209.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Verified", "c": 0}], "j": "2026-08-29T16:27:38.221000+00:00", "a": "2024-05-20T12:47:13Z", "f": "2026-08-29T16:27:38.856000+00:00", "l": "2026-10-12T11:59:15.530000+00:00", "mi": 53, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1201339800561664062": {"n": "Yishun_909", "u": "pepenabasa_00195", "av": "assets/c47ea536e54b_1201339800561664062.png", "c": 0, "r": [], "j": "", "a": "2024-01-29T01:35:28Z", "f": "2026-08-29T06:11:50.056000+00:00", "l": "2026-08-29T07:40:25.758000+00:00", "mi": 52, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1513116473676136589": {"n": "SideKick.", "u": "revanitzhere", "av": "assets/7def5dfadb84_1513116473676136589.png", "c": 0, "r": [], "j": "", "a": "2026-06-07T09:44:39Z", "f": "2026-08-25T12:49:05.975000+00:00", "l": "2026-08-25T13:04:47.081000+00:00", "mi": 49, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "TL", "cb": "assets/clan_cfae2f34c559.png"}, "1246338944010944524": {"n": "zzsir", "u": "zzsir", "av": "assets/0c700c2422ac_1246338944010944524.png", "c": 15844367, "r": [{"n": "All Star", "c": 15844367}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-11T17:19:45.887000+00:00", "a": "2024-06-01T05:46:00Z", "f": "2026-07-11T17:19:46.931000+00:00", "l": "2026-10-12T14:15:03.541000+00:00", "mi": 41, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "VAZ", "cb": "assets/clan_253c8e2063f1.png"}, "411916947773587456": {"n": "Jockie Music", "u": "Jockie Music", "av": "assets/be28e4a23d0f_411916947773587456.png", "c": 0, "r": [], "j": "", "a": "2018-02-10T16:10:53Z", "f": "2026-07-30T12:34:14.111000+00:00", "l": "2026-08-15T16:31:19.635000+00:00", "mi": 35, "bot": true, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1446164674382008371": {"n": "ProPlayer", "u": "cheesedrippybruh", "av": "assets/9ba40ee3d7f3_1446164674382008371.png", "c": 0, "r": [], "j": "", "a": "2025-12-04T15:42:06Z", "f": "2026-08-25T12:22:50.110000+00:00", "l": "2026-08-25T12:35:47.622000+00:00", "mi": 32, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1189833959056609333": {"n": "Moorosx", "u": "mooros1", "av": "assets/d0d02c87887b_1189833959056609333.png", "c": 11342935, "r": [{"n": "Battle Master", "c": 11342935}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-08-06T16:20:28.244000+00:00", "a": "2023-12-28T07:35:21Z", "f": "2026-08-06T14:24:24.935000+00:00", "l": "2026-10-10T10:26:33.070000+00:00", "mi": 27, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1261883605479587934": {"n": "Ken", "u": "nlken.", "av": "assets/51ce22edb2de_1261883605479587934.png", "c": 0, "r": [], "j": "", "a": "2024-07-14T03:14:56Z", "f": "2026-07-18T01:47:36.095000+00:00", "l": "2026-08-22T13:35:58.777000+00:00", "mi": 25, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "EToH", "cb": "assets/clan_ed25d60e4cbd.png"}, "412347257233604609": {"n": "Jockie Music (1)", "u": "Jockie Music (1)", "av": "assets/41bd64dc6250_412347257233604609.png", "c": 0, "r": [{"n": "Jockie Music (1)", "c": 0}], "j": "2026-09-04T02:45:56.201000+00:00", "a": "2018-02-11T20:40:47Z", "f": "2026-09-04T02:45:56.292000+00:00", "l": "2026-09-04T09:58:48.982000+00:00", "mi": 22, "bot": true, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "996030179900145715": {"n": "Sylvester", "u": "kangplayboy5011", "av": "assets/2a752235dbbf_996030179900145715.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-08-30T00:29:34.416000+00:00", "a": "2022-07-11T12:28:20Z", "f": "2026-08-30T00:29:34.682000+00:00", "l": "2026-09-20T14:01:24.474000+00:00", "mi": 22, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1467157224093782128": {"n": "Franz", "u": "franzerious", "av": "assets/318397271c04_1467157224093782128.png", "c": 0, "r": [], "j": "", "a": "2026-01-31T13:59:00Z", "f": "2026-07-12T02:11:23.843000+00:00", "l": "2026-08-16T12:04:26.025000+00:00", "mi": 18, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1501184356859777154": {"n": "Severus", "u": "severuslm", "av": "assets/65b8c30ca874_1501184356859777154.png", "c": 0, "r": [], "j": "", "a": "2026-05-05T11:30:41Z", "f": "2026-08-25T12:43:32.276000+00:00", "l": "2026-08-25T12:52:07.946000+00:00", "mi": 17, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1502528528594501712": {"n": "Rexref", "u": "jubilant_puppy_57080", "av": "assets/433dbf8f656a_1502528528594501712.png", "c": 0, "r": [], "j": "", "a": "2026-05-09T04:31:56Z", "f": "2026-09-01T06:14:51.094000+00:00", "l": "2026-09-02T17:06:48.646000+00:00", "mi": 17, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "BBZ", "cb": "assets/clan_76f7a002ef77.png"}, "429457053791158281": {"n": "Nekotina", "u": "Nekotina", "av": "assets/5a11aafb37db_429457053791158281.png", "c": 0, "r": [], "j": "", "a": "2018-03-31T01:49:00Z", "f": "2026-08-16T04:05:21.220000+00:00", "l": "2026-08-27T06:10:13.823000+00:00", "mi": 17, "bot": true, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1114439808161431673": {"n": "y", "u": "imunknwon123", "av": "", "c": 0, "r": [], "j": "", "a": "2023-06-03T06:25:55Z", "f": "2026-08-22T17:12:02.564000+00:00", "l": "2026-08-24T15:11:22.208000+00:00", "mi": 16, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1480835714433286185": {"n": "Mizukun", "u": "busy_tiger_62312", "av": "assets/e275f2286a55_1480835714433286185.png", "c": 0, "r": [], "j": "", "a": "2026-03-10T07:52:26Z", "f": "2026-09-01T10:21:38.652000+00:00", "l": "2026-09-02T03:50:49.121000+00:00", "mi": 13, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1454695654298489175": {"n": "VerticalnoSG", "u": "maxine02889", "av": "assets/aa77260fb42c_1454695654298489175.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-10-01T10:31:19.248000+00:00", "a": "2025-12-28T04:41:10Z", "f": "2026-10-01T10:31:19.465000+00:00", "l": "2026-10-12T11:40:04.874000+00:00", "mi": 6, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "426537812993638400": {"n": "Bloxlink", "u": "Bloxlink", "av": "assets/d3c0820ce834_426537812993638400.png", "c": 0, "r": [{"n": "Bloxlink", "c": 0}], "j": "2026-08-15T07:33:24.739000+00:00", "a": "2018-03-23T00:28:59Z", "f": "2026-08-15T07:33:24.995000+00:00", "l": "2026-09-04T05:10:29.717000+00:00", "mi": 5, "bot": true, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1218232877376864336": {"n": "StaticDragon365", "u": "mustafa_patel", "av": "assets/86d88b1a756e_1218232877376864336.png", "c": 0, "r": [], "j": "", "a": "2024-03-15T16:22:31Z", "f": "2026-08-30T13:41:25.115000+00:00", "l": "2026-09-13T08:03:38.322000+00:00", "mi": 4, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1267739643449970795": {"n": "Bobby", "u": "bobby062094", "av": "assets/69a9dbf0de99_1267739643449970795.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-18T08:03:37.040000+00:00", "a": "2024-07-30T07:04:44Z", "f": "2026-07-18T08:03:37.184000+00:00", "l": "2026-10-01T09:33:06.610000+00:00", "mi": 4, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1094519648759861248": {"n": "ηιησ тѕυη∂єяє_gιαη", "u": "lord_giann", "av": "assets/6323d2897455_1094519648759861248.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-12T05:09:50.318000+00:00", "a": "2023-04-09T07:10:19Z", "f": "2026-07-12T05:09:52.243000+00:00", "l": "2026-09-07T14:14:02.981000+00:00", "mi": 3, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "897831722941579295": {"n": "Atharos", "u": "justinbieberfake", "av": "assets/87aae4d9efda_897831722941579295.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-08-18T14:29:25.280000+00:00", "a": "2021-10-13T13:02:43Z", "f": "2026-08-18T14:29:25.359000+00:00", "l": "2026-10-10T16:26:15.071000+00:00", "mi": 3, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1208448998072127579": {"n": "The_Nolan", "u": "nolan_theg0at", "av": "assets/d3bdc6751e7b_1208448998072127579.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-09-06T16:55:04.246000+00:00", "a": "2024-02-17T16:24:53Z", "f": "2026-09-06T16:55:04.456000+00:00", "l": "2026-09-06T16:56:08.950000+00:00", "mi": 3, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1414899505442066433": {"n": "Tuyul☄", "u": "tuyulganteng0858", "av": "assets/b3357bfb4daa_1414899505442066433.png", "c": 0, "r": [], "j": "", "a": "2025-09-09T09:05:29Z", "f": "2026-07-13T16:14:43.797000+00:00", "l": "2026-08-22T10:41:53.246000+00:00", "mi": 3, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1367277177757896744": {"n": "1945fhgc", "u": "1945fhgc", "av": "assets/d5084f177f1a_1367277177757896744.png", "c": 0, "r": [], "j": "", "a": "2025-04-30T23:11:21Z", "f": "2026-07-17T06:59:57.917000+00:00", "l": "2026-08-26T09:58:15.045000+00:00", "mi": 3, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1301066210141671496": {"n": "xXNev3RXx", "u": "xxnev3rxx", "av": "assets/14493d9f5bc1_1301066210141671496.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-12T11:31:50.639000+00:00", "a": "2024-10-30T06:12:37Z", "f": "2026-07-12T11:31:50.742000+00:00", "l": "2026-07-14T13:24:05.881000+00:00", "mi": 2, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1134013235599777812": {"n": "Doesn'tMakeSense", "u": "senseyyyyyyy", "av": "assets/375376130115_1134013235599777812.png", "c": 0, "r": [], "j": "", "a": "2023-07-27T06:43:44Z", "f": "2026-08-22T13:27:33.223000+00:00", "l": "2026-08-22T13:30:41.500000+00:00", "mi": 2, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "BWAH", "cb": "assets/clan_ec60c5e6d1f1.png", "fid": 3, "eid": 7, "fc": [10934771, 3523053, 620963, 3323110, 7922930]}, "1509931383018229901": {"n": "ℙ𝕙𝕦𝕔", "u": "phucilovesora", "av": "assets/68f6bc78ee20_1509931383018229901.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-09-21T05:45:23.853000+00:00", "a": "2026-05-29T14:48:14Z", "f": "2026-09-21T05:45:24.098000+00:00", "l": "2026-09-24T22:52:45.900000+00:00", "mi": 2, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "SGKU", "cb": "assets/clan_e985287f5922.png"}, "1332318540543561803": {"n": "Void not ain", "u": "harry_1234_091", "av": "assets/ab189de703e5_1332318540543561803.png", "c": 11342935, "r": [{"n": "Battle Master", "c": 11342935}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-07-12T01:20:17.639000+00:00", "a": "2025-01-24T11:58:13Z", "f": "2026-07-12T01:20:19.608000+00:00", "l": "2026-07-12T01:20:40.330000+00:00", "mi": 2, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1184211687235137576": {"n": "Cute bot", "u": "Cute bot", "av": "assets/4b48369006c2_1184211687235137576.png", "c": 0, "r": [], "j": "", "a": "2023-12-12T19:14:27Z", "f": "2026-08-16T12:23:06.527000+00:00", "l": "2026-08-16T12:25:45.428000+00:00", "mi": 2, "bot": true, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1414579409700126780": {"n": "Yumiko", "u": "khlenny", "av": "assets/b967acc2acc3_1414579409700126780.png", "c": 0, "r": [], "j": "", "a": "2025-09-08T11:53:32Z", "f": "2026-08-16T05:45:49.384000+00:00", "l": "2026-08-16T05:45:49.384000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1309161569762017420": {"n": "Jurica♰", "u": "bradpittgoat", "av": "assets/83e84367665e_1309161569762017420.png", "c": 0, "r": [], "j": "", "a": "2024-11-21T14:20:41Z", "f": "2026-08-17T14:34:43.461000+00:00", "l": "2026-08-17T14:34:43.461000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "KOH", "cb": "assets/clan_b6f6582eb030.png", "fid": 15, "eid": 2, "fc": [3081602, 6094848]}, "1390007160284643342": {"n": "𖹭 Jorda𝖓 𖹭", "u": "j_xrdan", "av": "assets/b3ab5f63bea4_1390007160284643342.png", "c": 0, "r": [], "j": "", "a": "2025-07-02T16:32:12Z", "f": "2026-08-18T04:35:13.996000+00:00", "l": "2026-08-18T04:35:13.996000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": "", "fid": 15, "eid": 7, "fc": [0, 16711680, 0, 16711680, 0]}, "1417059469354860554": {"n": "UncleBilly", "u": "biliternor.com", "av": "assets/a36857a493f5_1417059469354860554.png", "c": 0, "r": [], "j": "", "a": "2025-09-15T08:08:25Z", "f": "2026-08-18T19:04:39.431000+00:00", "l": "2026-08-18T19:04:39.431000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "TL", "cb": "assets/clan_cfae2f34c559.png", "fid": 14, "eid": 2, "fc": [0, 16777215]}, "1447496633305792582": {"n": "icetea", "u": "iky08berapa", "av": "assets/0693dd98fc88_1447496633305792582.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}, {"n": "Unverified", "c": 0}], "j": "2026-08-25T00:50:11.829000+00:00", "a": "2025-12-08T07:54:50Z", "f": "2026-08-25T00:50:12.350000+00:00", "l": "2026-08-25T00:50:12.350000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1240963885750550549": {"n": "︵  shivs  ◌Ⳋ𝅄", "u": "mss.jd", "av": "assets/f4c4e5e44672_1240963885750550549.png", "c": 0, "r": [], "j": "", "a": "2024-05-17T09:47:26Z", "f": "2026-08-25T12:49:17.095000+00:00", "l": "2026-08-25T12:49:17.095000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": ":3", "cb": "assets/clan_ff2e7c7d9f37.png", "fid": 3, "eid": 4, "fc": [11262070]}, "1246377899687280723": {"n": "Windy", "u": "aureliuszxy", "av": "assets/4a699babc855_1246377899687280723.png", "c": 0, "r": [], "j": "", "a": "2024-06-01T08:20:47Z", "f": "2026-08-25T12:53:04.033000+00:00", "l": "2026-08-25T12:53:04.033000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1010230348724064318": {"n": "SKY_MaxMax", "u": "skymaxmax", "av": "assets/fd031b661a13_1010230348724064318.png", "c": 0, "r": [], "j": "", "a": "2022-08-19T16:54:44Z", "f": "2026-07-17T16:22:35.605000+00:00", "l": "2026-07-17T16:22:35.605000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1358455079182667998": {"n": "Clear", "u": "shiesty0400", "av": "assets/26dc953ee00f_1358455079182667998.png", "c": 0, "r": [], "j": "", "a": "2025-04-06T14:55:29Z", "f": "2026-07-18T08:14:42.307000+00:00", "l": "2026-07-18T08:14:42.307000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "goth", "cb": "assets/clan_b1dc33d557c4.png"}, "1175035487610749019": {"n": "Jiyonzy", "u": "jiyonzy", "av": "assets/d905e1475bee_1175035487610749019.png", "c": 0, "r": [], "j": "", "a": "2023-11-17T11:31:31Z", "f": "2026-07-27T12:11:52.535000+00:00", "l": "2026-07-27T12:11:52.535000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1446836652499538088": {"n": "FlameDragon🔥", "u": "dragon_camolibbya", "av": "assets/32e9b5318a0a_1446836652499538088.png", "c": 0, "r": [], "j": "", "a": "2025-12-06T12:12:18Z", "f": "2026-07-27T12:12:22.433000+00:00", "l": "2026-07-27T12:12:22.433000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1527898877053632715": {"n": "Ace", "u": "top1running_59369", "av": "", "c": 0, "r": [], "j": "", "a": "2026-07-18T04:44:39Z", "f": "2026-08-01T12:18:58.042000+00:00", "l": "2026-08-01T12:18:58.042000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1526538222841106484": {"n": "OstAstronaut", "u": "ostastronaut.", "av": "assets/5962e296593a_1526538222841106484.png", "c": 0, "r": [], "j": "", "a": "2026-07-14T10:37:54Z", "f": "2026-08-07T04:48:25.375000+00:00", "l": "2026-08-07T04:48:25.375000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1481658656318816372": {"n": "Kat", "u": "vpkat12", "av": "assets/bca1d5432145_1481658656318816372.png", "c": 10038562, "r": [{"n": "Trial Knight", "c": 10038562}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-08-07T11:46:26.797000+00:00", "a": "2026-03-12T14:22:31Z", "f": "2026-08-07T11:46:29.547000+00:00", "l": "2026-08-07T11:46:29.547000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1388431489829437540": {"n": "𝑅𝑒𝓆𝓊𝒾𝑒𝓂", "u": "abadon132", "av": "assets/12c3ffa151d6_1388431489829437540.png", "c": 4053, "r": [{"n": "Mvp", "c": 4053}, {"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-08-07T11:54:14.987000+00:00", "a": "2025-06-28T08:11:02Z", "f": "2026-08-07T11:54:15.306000+00:00", "l": "2026-08-07T11:54:15.306000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "", "cb": ""}, "1378506397314187274": {"n": "Ｒｏｂｉｎ", "u": "wxykidd", "av": "assets/db3dd24ec851_1378506397314187274.png", "c": 3447003, "r": [{"n": "LIQUID TEAM", "c": 3447003}], "j": "2026-08-08T11:47:53.999000+00:00", "a": "2025-05-31T22:52:16Z", "f": "2026-08-08T11:47:54.088000+00:00", "l": "2026-08-08T11:47:54.088000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": true, "ct": "GKRN", "cb": "assets/clan_0a93f40ea22b.png"}, "1533936886282977312": {"n": "Shxdow", "u": "wh1tex0774", "av": "assets/477fc4fd1771_1533936886282977312.png", "c": 0, "r": [], "j": "", "a": "2026-08-03T20:37:32Z", "f": "2026-08-12T02:46:20.352000+00:00", "l": "2026-08-12T02:46:20.352000+00:00", "mi": 1, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "270904126974590976": {"n": "Dank Memer", "u": "Dank Memer", "av": "assets/bccb181a0269_270904126974590976.png", "c": 0, "r": [], "j": "", "a": "2017-01-17T13:16:17Z", "f": "2026-08-23T15:07:32.814000+00:00", "l": "2026-08-23T15:07:32.814000+00:00", "mi": 1, "bot": true, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "195244363339530240": {"n": "KawaiiBot", "u": "KawaiiBot", "av": "assets/784cf7fd8857_195244363339530240.png", "c": 0, "r": [], "j": "", "a": "2016-06-22T18:31:23Z", "f": "2026-08-27T06:09:55.721000+00:00", "l": "2026-08-27T06:09:55.721000+00:00", "mi": 1, "bot": true, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1149535834756874250": {"n": "greed", "u": "greed", "av": "assets/a3bd65dddb75_1149535834756874250.png", "c": 0, "r": [], "j": "", "a": "2023-09-08T02:45:00Z", "f": "2026-09-08T14:02:18.413000+00:00", "l": "2026-09-08T14:02:18.413000+00:00", "mi": 1, "bot": true, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1095244163584376922": {"n": "0hColdy", "u": "0hcoldy", "av": "", "c": 0, "r": [], "j": "", "a": "2023-04-11T07:09:17Z", "f": "", "l": "", "mi": 0, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}, "1372884587302092830": {"n": "Zₑₓₒ", "u": "zexozexo", "av": "", "c": 0, "r": [], "j": "", "a": "2025-05-16T10:33:12Z", "f": "", "l": "", "mi": 0, "bot": false, "bn": 0, "ac": 0, "ins": false, "ct": "", "cb": ""}}, "rolecolors": {"1525533054574002246": {"name": "@everyone", "color": 0, "position": 0}, "1525533054586847404": {"name": "「👑」Owner", "color": 16711680, "position": 26}, "1532367778210906257": {"name": "Lara✨", "color": 0, "position": 25}, "1534950872264605946": {"name": "Owner", "color": 204911, "position": 24}, "1534952059256832180": {"name": "LIQUID TEAM", "color": 3447003, "position": 11}, "1534955459885404362": {"name": "carl-bot", "color": 0, "position": 10}, "1534955683232088176": {"name": "Jockie Music (2)", "color": 0, "position": 9}, "1534955766316798066": {"name": "Phoenix", "color": 0, "position": 8}, "1534958394555891892": {"name": "Slave", "color": 1184274, "position": 23}, "1538088206086574151": {"name": "Bloxlink", "color": 0, "position": 7}, "1540621264832438302": {"name": "Elite Duelist", "color": 1752220, "position": 12}, "1540621349783871518": {"name": "Battle Master", "color": 11342935, "position": 13}, "1540621417765146645": {"name": "All Star", "color": 15844367, "position": 14}, "1540621495191998514": {"name": "Core Knight", "color": 10181046, "position": 15}, "1540621575286427649": {"name": "Mvp", "color": 4053, "position": 16}, "1540621672262930514": {"name": "Trial Knight", "color": 10038562, "position": 17}, "1540621735118766170": {"name": "Warlord", "color": 14745629, "position": 20}, "1540621815028654180": {"name": "Retired Buns", "color": 16390, "position": 19}, "1540621974215331870": {"name": "GrandMaster", "color": 2044, "position": 21}, "1540712059254083684": {"name": "Verified", "color": 0, "position": 6}, "1541610616018436106": {"name": "Unverified", "color": 0, "position": 5}, "1542157473815724093": {"name": "SSS Tier 👑", "color": 16771840, "position": 22}, "1544012157295792219": {"name": "Best duo", "color": 10181046, "position": 4}, "1545263617769742429": {"name": "Jockie Music (1)", "color": 0, "position": 3}, "1546151211458371734": {"name": "Handsome", "color": 15277667, "position": 2}, "1548593208601083984": {"name": "Goblin", "color": 0, "position": 1}, "1549089105458110534": {"name": "Greatest Loyalist oat", "color": 15277667, "position": 18}}, "members": [{"id": "1095244163584376922", "n": "0hColdy", "av": "", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1367277177757896744", "n": "1945fhgc", "av": "assets/d5084f177f1a_1367277177757896744.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1527898877053632715", "n": "Ace", "av": "", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "897831722941579295", "n": "Atharos", "av": "assets/87aae4d9efda_897831722941579295.png", "c": 3447003, "r": ["1534952059256832180"], "ins": true, "bot": false, "j": "2026-08-18T14:29:25.280000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1117347787512758294", "n": "awnais3", "av": "assets/aed5f0e7d82a_1117347787512758294.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": ">ᆺ<", "cb": "assets/clan_ec60c5e6d1f1.png", "fid": null, "eid": null, "fc": []}, {"id": "426537812993638400", "n": "Bloxlink", "av": "assets/d3c0820ce834_426537812993638400.png", "c": 0, "r": ["1538088206086574151"], "ins": true, "bot": true, "j": "2026-08-15T07:33:24.739000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1267739643449970795", "n": "Bobby", "av": "assets/69a9dbf0de99_1267739643449970795.png", "c": 3447003, "r": ["1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-18T08:03:37.040000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1468545584817377361", "n": "Boomfarter99", "av": "assets/ceeadb805624_1468545584817377361.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-09-11T14:15:34.798000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1527329053273493527", "n": "BしѺѺの尺ﾑ乙乇  XD", "av": "assets/77287d49a87d_1527329053273493527.png", "c": 15277667, "r": ["1540621672262930514", "1534952059256832180", "1549089105458110534"], "ins": true, "bot": false, "j": "2026-07-19T07:33:27.464000+00:00", "ct": "𝙴𝚂", "cb": "assets/clan_bc2f7685eed9.png", "fid": null, "eid": null, "fc": []}, {"id": "235148962103951360", "n": "Carl-bot", "av": "assets/7df86cdc1f61_235148962103951360.png", "c": 1184274, "r": ["1534955459885404362", "1534958394555891892"], "ins": true, "bot": true, "j": "2026-08-06T16:04:59.790000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1358455079182667998", "n": "Clear", "av": "assets/26dc953ee00f_1358455079182667998.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "goth", "cb": "assets/clan_b1dc33d557c4.png", "fid": null, "eid": null, "fc": []}, {"id": "1184211687235137576", "n": "Cute bot", "av": "assets/4b48369006c2_1184211687235137576.png", "c": 0, "r": [], "ins": false, "bot": true, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "270904126974590976", "n": "Dank Memer", "av": "assets/bccb181a0269_270904126974590976.png", "c": 0, "r": [], "ins": false, "bot": true, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1494933611445751829", "n": "Desileader_virajijj", "av": "", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-09-05T06:18:46.384000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1529845975261249718", "n": "Desync monster", "av": "assets/720194ea22e7_1529845975261249718.png", "c": 11342935, "r": ["1534952059256832180", "1540712059254083684", "1540621349783871518"], "ins": true, "bot": false, "j": "2026-08-01T11:59:21.100000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1134013235599777812", "n": "Doesn'tMakeSense", "av": "assets/375376130115_1134013235599777812.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "BWAH", "cb": "assets/clan_ec60c5e6d1f1.png", "fid": 3, "eid": 7, "fc": [10934771, 3523053, 620963, 3323110, 7922930]}, {"id": "1205421851619233848", "n": "Doux Larper", "av": "assets/66356d760eeb_1205421851619233848.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684", "1546151211458371734"], "ins": true, "bot": false, "j": "2026-09-02T08:53:55.620000+00:00", "ct": "HZ", "cb": "assets/clan_6ed907032e3a.png", "fid": null, "eid": null, "fc": []}, {"id": "709948287804768286", "n": "Flame", "av": "assets/a1c4464ab1f1_709948287804768286.png", "c": 16711680, "r": ["1540712059254083684", "1534952059256832180", "1525533054586847404", "1540621815028654180"], "ins": true, "bot": false, "j": "2026-07-19T05:37:47.487000+00:00", "ct": "EPR", "cb": "assets/clan_ba95480f7a85.png", "fid": null, "eid": null, "fc": []}, {"id": "1446836652499538088", "n": "FlameDragon🔥", "av": "assets/32e9b5318a0a_1446836652499538088.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "884794512961044481", "n": "Folk", "av": "assets/53e6fadc525d_884794512961044481.png", "c": 16711680, "r": ["1525533054586847404"], "ins": true, "bot": false, "j": "2026-08-17T10:06:23.190000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1467157224093782128", "n": "Franz", "av": "assets/318397271c04_1467157224093782128.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1386691432760348724", "n": "ginga my dog", "av": "assets/7fd29adbea67_1386691432760348724.png", "c": 1184274, "r": ["1540621575286427649", "1534958394555891892", "1534952059256832180", "1540621815028654180"], "ins": true, "bot": false, "j": "2026-07-13T09:37:15.710000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1149535834756874250", "n": "greed", "av": "assets/a3bd65dddb75_1149535834756874250.png", "c": 0, "r": [], "ins": false, "bot": true, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1267076714068967528", "n": "Greenmelon", "av": "assets/01ffeb789036_1267076714068967528.png", "c": 10181046, "r": ["1540621495191998514", "1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-08-16T02:40:41.694000+00:00", "ct": "Sols", "cb": "assets/clan_c3907146e8c1.png", "fid": 15, "eid": 7, "fc": [71424, 207105, 612353, 766464, 65285]}, {"id": "1447496633305792582", "n": "icetea", "av": "assets/0693dd98fc88_1447496633305792582.png", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-08-25T00:50:11.829000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1175035487610749019", "n": "Jiyonzy", "av": "assets/d905e1475bee_1175035487610749019.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "411916947773587456", "n": "Jockie Music", "av": "assets/be28e4a23d0f_411916947773587456.png", "c": 0, "r": [], "ins": false, "bot": true, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "412347257233604609", "n": "Jockie Music (1)", "av": "assets/41bd64dc6250_412347257233604609.png", "c": 0, "r": ["1545263617769742429"], "ins": true, "bot": true, "j": "2026-09-04T02:45:56.201000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "412347553141751808", "n": "Jockie Music (2)", "av": "assets/c16e8748678b_412347553141751808.png", "c": 1184274, "r": ["1534955683232088176", "1534958394555891892"], "ins": true, "bot": true, "j": "2026-08-06T16:05:53.102000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1309161569762017420", "n": "Jurica♰", "av": "assets/83e84367665e_1309161569762017420.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "KOH", "cb": "assets/clan_b6f6582eb030.png", "fid": 15, "eid": 2, "fc": [3081602, 6094848]}, {"id": "1324530642196631626", "n": "Jxne", "av": "assets/195725b1d7e6_1324530642196631626.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1481658656318816372", "n": "Kat", "av": "assets/bca1d5432145_1481658656318816372.png", "c": 10038562, "r": ["1540621672262930514", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-08-07T11:46:26.797000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "195244363339530240", "n": "KawaiiBot", "av": "assets/784cf7fd8857_195244363339530240.png", "c": 0, "r": [], "ins": false, "bot": true, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1261883605479587934", "n": "Ken", "av": "assets/51ce22edb2de_1261883605479587934.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "EToH", "cb": "assets/clan_ed25d60e4cbd.png", "fid": null, "eid": null, "fc": []}, {"id": "944016826751389717", "n": "Lara✨", "av": "assets/6380a57d14db_944016826751389717.png", "c": 1184274, "r": ["1532367778210906257", "1534958394555891892"], "ins": true, "bot": true, "j": "2026-07-30T12:42:28.438000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "853175484916301826", "n": "LordAkuma", "av": "assets/07b04bb19d7a_853175484916301826.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1286957983820943423", "n": "lulu 😃", "av": "assets/21611691d573_1286957983820943423.png", "c": 16771840, "r": ["1534952059256832180", "1542157473815724093", "1540621974215331870"], "ins": true, "bot": false, "j": "2026-07-13T08:39:04.696000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1480835714433286185", "n": "Mizukun", "av": "assets/e275f2286a55_1480835714433286185.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1189833959056609333", "n": "Moorosx", "av": "assets/d0d02c87887b_1189833959056609333.png", "c": 11342935, "r": ["1534952059256832180", "1540621349783871518"], "ins": true, "bot": false, "j": "2026-08-06T16:20:28.244000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1322830370483474487", "n": "Mossrala ucuk slave", "av": "assets/7cc232a3e54c_1322830370483474487.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-09-22T09:42:44.132000+00:00", "ct": "", "cb": "", "fid": 3, "eid": 1, "fc": []}, {"id": "429457053791158281", "n": "Nekotina", "av": "assets/5a11aafb37db_429457053791158281.png", "c": 0, "r": [], "ins": false, "bot": true, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1140487641775747112", "n": "Oefkiseisid", "av": "assets/750bcbcfe078_1140487641775747112.png", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-09-05T03:56:10.026000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1526538222841106484", "n": "OstAstronaut", "av": "assets/5962e296593a_1526538222841106484.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1491732757284393062", "n": "Pepper", "av": "assets/65af2a756320_1491732757284393062.png", "c": 11342935, "r": ["1534952059256832180", "1540712059254083684", "1540621349783871518"], "ins": true, "bot": false, "j": "2026-07-20T13:56:12.697000+00:00", "ct": "𝙴𝚂", "cb": "assets/clan_bc2f7685eed9.png", "fid": null, "eid": null, "fc": []}, {"id": "1230149118710779914", "n": "Phoenix", "av": "assets/8afe8e924207_1230149118710779914.png", "c": 1184274, "r": ["1534955766316798066", "1534958394555891892"], "ins": true, "bot": true, "j": "2026-08-06T16:06:12.895000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1446164674382008371", "n": "ProPlayer", "av": "assets/9ba40ee3d7f3_1446164674382008371.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1502528528594501712", "n": "Rexref", "av": "assets/433dbf8f656a_1502528528594501712.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "BBZ", "cb": "assets/clan_76f7a002ef77.png", "fid": null, "eid": null, "fc": []}, {"id": "1353912831720034356", "n": "Sanchez", "av": "assets/329e238073c2_1353912831720034356.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1242096293808050209", "n": "Saturn", "av": "assets/f2fc1e12d88e_1242096293808050209.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-08-29T16:27:38.221000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1501184356859777154", "n": "Severus", "av": "assets/65b8c30ca874_1501184356859777154.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1498624251127926915", "n": "Shum???", "av": "assets/62303be7f02b_1498624251127926915.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1533936886282977312", "n": "Shxdow", "av": "assets/477fc4fd1771_1533936886282977312.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1513116473676136589", "n": "SideKick.", "av": "assets/7def5dfadb84_1513116473676136589.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "TL", "cb": "assets/clan_cfae2f34c559.png", "fid": null, "eid": null, "fc": []}, {"id": "1010230348724064318", "n": "SKY_MaxMax", "av": "assets/fd031b661a13_1010230348724064318.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1218232877376864336", "n": "StaticDragon365", "av": "assets/86d88b1a756e_1218232877376864336.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "996030179900145715", "n": "Sylvester", "av": "assets/2a752235dbbf_996030179900145715.png", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-08-30T00:29:34.416000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1550926511236849717", "n": "Tazzy obsession", "av": "assets/8ef8d121b0d4_1550926511236849717.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-09-19T21:27:40.471000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1208448998072127579", "n": "The_Nolan", "av": "assets/d3bdc6751e7b_1208448998072127579.png", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-09-06T16:55:04.246000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1414899505442066433", "n": "Tuyul☄", "av": "assets/b3357bfb4daa_1414899505442066433.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1375082770736353281", "n": "Ucuk", "av": "assets/b1b5e5956385_1375082770736353281.png", "c": 204911, "r": ["1534950872264605946", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-11T16:03:43.903000+00:00", "ct": "TSA", "cb": "assets/clan_7932371bebba.png", "fid": null, "eid": null, "fc": []}, {"id": "1417059469354860554", "n": "UncleBilly", "av": "assets/a36857a493f5_1417059469354860554.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "TL", "cb": "assets/clan_cfae2f34c559.png", "fid": 14, "eid": 2, "fc": [0, 16777215]}, {"id": "780152454695223316", "n": "Ur Owner", "av": "assets/6c11354acd4e_780152454695223316.png", "c": 204911, "r": ["1534950872264605946", "1534958394555891892"], "ins": true, "bot": false, "j": "2026-07-27T12:41:31.390000+00:00", "ct": "𝙴𝚂", "cb": "assets/clan_bc2f7685eed9.png", "fid": null, "eid": null, "fc": []}, {"id": "1454695654298489175", "n": "VerticalnoSG", "av": "assets/aa77260fb42c_1454695654298489175.png", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-10-01T10:31:19.248000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1332318540543561803", "n": "Void not ain", "av": "assets/ab189de703e5_1332318540543561803.png", "c": 11342935, "r": ["1534952059256832180", "1540621349783871518"], "ins": true, "bot": false, "j": "2026-07-12T01:20:17.639000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1384425757190783039", "n": "void_ain", "av": "assets/984dd3da2ae9_1384425757190783039.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "GAZA", "cb": "assets/clan_a37bf4789bbb.png", "fid": null, "eid": null, "fc": []}, {"id": "854254208847839262", "n": "Void_ain", "av": "assets/aa56539c829a_854254208847839262.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "698142490775257119", "n": "volc", "av": "assets/b00763b22458_698142490775257119.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-09-18T17:00:34.584000+00:00", "ct": "hix", "cb": "assets/clan_c08ecb1ef98d.png", "fid": 6, "eid": 3, "fc": [14737632]}, {"id": "1285188145440362580", "n": "Waz_ED", "av": "assets/1817a535fea0_1285188145440362580.png", "c": 4053, "r": ["1540621575286427649", "1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-07-28T08:52:07.431000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1246377899687280723", "n": "Windy", "av": "assets/4a699babc855_1246377899687280723.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1209730439795707966", "n": "xXHughZXx", "av": "assets/2c6ef76b9606_1209730439795707966.png", "c": 2044, "r": ["1534952059256832180", "1546151211458371734", "1540621974215331870"], "ins": true, "bot": false, "j": "2026-08-31T07:03:35.987000+00:00", "ct": "Sols", "cb": "assets/clan_c3907146e8c1.png", "fid": null, "eid": null, "fc": []}, {"id": "897890698282561646", "n": "xXNev3RXx", "av": "assets/73f88a28c317_897890698282561646.png", "c": 16711680, "r": ["1541610616018436106", "1525533054586847404", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-21T10:23:38.530000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1301066210141671496", "n": "xXNev3RXx", "av": "assets/14493d9f5bc1_1301066210141671496.png", "c": 3447003, "r": ["1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-12T11:31:50.639000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1114439808161431673", "n": "y", "av": "", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1201339800561664062", "n": "Yishun_909", "av": "assets/c47ea536e54b_1201339800561664062.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1414579409700126780", "n": "Yumiko", "av": "assets/b967acc2acc3_1414579409700126780.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1531877331059085521", "n": "YUTA", "av": "assets/0bde20188dc5_1531877331059085521.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "CNFG", "cb": "assets/clan_133213d8c1bf.png", "fid": null, "eid": null, "fc": []}, {"id": "1446010791525617715", "n": "Yzz", "av": "assets/83f555d7d6eb_1446010791525617715.png", "c": 3447003, "r": ["1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-17T01:47:15.673000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1246338944010944524", "n": "zzsir", "av": "assets/0c700c2422ac_1246338944010944524.png", "c": 15844367, "r": ["1534952059256832180", "1540621417765146645"], "ins": true, "bot": false, "j": "2026-07-11T17:19:45.887000+00:00", "ct": "VAZ", "cb": "assets/clan_253c8e2063f1.png", "fid": null, "eid": null, "fc": []}, {"id": "1372884587302092830", "n": "Zₑₓₒ", "av": "", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1094519648759861248", "n": "ηιησ тѕυη∂єяє_gιαη", "av": "assets/6323d2897455_1094519648759861248.png", "c": 3447003, "r": ["1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-12T05:09:50.318000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1063863687271698523", "n": "༺ღ༒ ιт'z.мє_уυкι ༒ღ༻", "av": "assets/cee9a10dc5d5_1063863687271698523.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1509931383018229901", "n": "ℙ𝕙𝕦𝕔", "av": "assets/68f6bc78ee20_1509931383018229901.png", "c": 3447003, "r": ["1541610616018436106", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-09-21T05:45:23.853000+00:00", "ct": "SGKU", "cb": "assets/clan_e985287f5922.png", "fid": null, "eid": null, "fc": []}, {"id": "1386522748867711188", "n": "亗  🇾 🇺 🇹 🇦 亗  ✞ঔৣ ᎶᎧᎶᎧᎦ ঔৣ✞", "av": "assets/447b3d4dc05d_1386522748867711188.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "VBL", "cb": "assets/clan_ec2515fd2a66.png", "fid": null, "eid": null, "fc": []}, {"id": "1240963885750550549", "n": "︵  shivs  ◌Ⳋ𝅄", "av": "assets/f4c4e5e44672_1240963885750550549.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": ":3", "cb": "assets/clan_ff2e7c7d9f37.png", "fid": 3, "eid": 4, "fc": [11262070]}, {"id": "1378506397314187274", "n": "Ｒｏｂｉｎ", "av": "assets/db3dd24ec851_1378506397314187274.png", "c": 3447003, "r": ["1534952059256832180"], "ins": true, "bot": false, "j": "2026-08-08T11:47:53.999000+00:00", "ct": "GKRN", "cb": "assets/clan_0a93f40ea22b.png", "fid": null, "eid": null, "fc": []}, {"id": "1390007160284643342", "n": "𖹭 Jorda𝖓 𖹭", "av": "assets/b3ab5f63bea4_1390007160284643342.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": 15, "eid": 7, "fc": [0, 16711680, 0, 16711680, 0]}, {"id": "1388431489829437540", "n": "𝑅𝑒𝓆𝓊𝒾𝑒𝓂", "av": "assets/12c3ffa151d6_1388431489829437540.png", "c": 4053, "r": ["1540621575286427649", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-08-07T11:54:14.987000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1530336622099300430", "n": "𝓞𝔂𝓮𝓷𝓰𝓻𝓮𝓪𝓽", "av": "assets/111f9206391a_1530336622099300430.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1508520345953374359", "n": "𝚃𝚑𝚎 𝙸𝚖𝚙𝚞𝚕𝚜𝚎", "av": "", "c": 1184274, "r": ["1534958394555891892", "1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-08-22T16:41:19.745000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1397192564003704852", "n": "𝚅𝚎𝚐𝙲𝚞𝚛𝚛𝚢", "av": "assets/7efda10e1155_1397192564003704852.png", "c": 0, "r": [], "ins": false, "bot": false, "j": "", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1153372250297356419", "n": "𝟒𝟗𝟏𝕰𝕵𝕱", "av": "assets/35ec6ed6853f_1153372250297356419.png", "c": 14745629, "r": ["1540621735118766170", "1534952059256832180"], "ins": true, "bot": false, "j": "2026-07-19T05:24:16.615000+00:00", "ct": "", "cb": "", "fid": null, "eid": null, "fc": []}, {"id": "1121774401164148757", "n": "🔥DRAGON_RYUGA🔥", "av": "assets/f8e11beed4d0_1121774401164148757.png", "c": 3447003, "r": ["1534952059256832180", "1540712059254083684"], "ins": true, "bot": false, "j": "2026-09-03T11:41:49.987000+00:00", "ct": "BLR", "cb": "assets/clan_d5ee13c5f59c.png", "fid": null, "eid": null, "fc": []}], "roles": [{"id": "1525533054574002246", "name": "@everyone", "c": 0, "hoist": false, "position": 0, "member_count": 0}, {"id": "1525533054586847404", "name": "「👑」Owner", "c": 16711680, "hoist": true, "position": 26, "member_count": 3}, {"id": "1532367778210906257", "name": "Lara✨", "c": 0, "hoist": false, "position": 25, "member_count": 1}, {"id": "1534950872264605946", "name": "Owner", "c": 204911, "hoist": true, "position": 24, "member_count": 2}, {"id": "1534952059256832180", "name": "LIQUID TEAM", "c": 3447003, "hoist": true, "position": 11, "member_count": 38}, {"id": "1534955459885404362", "name": "carl-bot", "c": 0, "hoist": false, "position": 10, "member_count": 1}, {"id": "1534955683232088176", "name": "Jockie Music (2)", "c": 0, "hoist": false, "position": 9, "member_count": 1}, {"id": "1534955766316798066", "name": "Phoenix", "c": 0, "hoist": false, "position": 8, "member_count": 1}, {"id": "1534958394555891892", "name": "Slave", "c": 1184274, "hoist": false, "position": 23, "member_count": 7}, {"id": "1538088206086574151", "name": "Bloxlink", "c": 0, "hoist": false, "position": 7, "member_count": 1}, {"id": "1540621264832438302", "name": "Elite Duelist", "c": 1752220, "hoist": true, "position": 12, "member_count": 0}, {"id": "1540621349783871518", "name": "Battle Master", "c": 11342935, "hoist": true, "position": 13, "member_count": 4}, {"id": "1540621417765146645", "name": "All Star", "c": 15844367, "hoist": true, "position": 14, "member_count": 1}, {"id": "1540621495191998514", "name": "Core Knight", "c": 10181046, "hoist": true, "position": 15, "member_count": 1}, {"id": "1540621575286427649", "name": "Mvp", "c": 4053, "hoist": true, "position": 16, "member_count": 3}, {"id": "1540621672262930514", "name": "Trial Knight", "c": 10038562, "hoist": true, "position": 17, "member_count": 2}, {"id": "1540621735118766170", "name": "Warlord", "c": 14745629, "hoist": true, "position": 20, "member_count": 1}, {"id": "1540621815028654180", "name": "Retired Buns", "c": 16390, "hoist": true, "position": 19, "member_count": 2}, {"id": "1540621974215331870", "name": "GrandMaster", "c": 2044, "hoist": true, "position": 21, "member_count": 2}, {"id": "1540712059254083684", "name": "Verified", "c": 0, "hoist": false, "position": 6, "member_count": 13}, {"id": "1541610616018436106", "name": "Unverified", "c": 0, "hoist": false, "position": 5, "member_count": 8}, {"id": "1542157473815724093", "name": "SSS Tier 👑", "c": 16771840, "hoist": false, "position": 22, "member_count": 1}, {"id": "1544012157295792219", "name": "Best duo", "c": 10181046, "hoist": false, "position": 4, "member_count": 0}, {"id": "1545263617769742429", "name": "Jockie Music (1)", "c": 0, "hoist": false, "position": 3, "member_count": 1}, {"id": "1546151211458371734", "name": "Handsome", "c": 15277667, "hoist": false, "position": 2, "member_count": 2}, {"id": "1548593208601083984", "name": "Goblin", "c": 0, "hoist": false, "position": 1, "member_count": 0}, {"id": "1549089105458110534", "name": "Greatest Loyalist oat", "c": 15277667, "hoist": false, "position": 18, "member_count": 1}], "emoji": {"1535572461502996490": "assets/emoji_1535572461502996490.png", "1535573564390899812": "assets/emoji_1535573564390899812.png", "1535573611430023178": "assets/emoji_1535573611430023178.png", "1535575303248674888": "assets/emoji_1535575303248674888.png", "1535575470152884244": "assets/emoji_1535575470152884244.png"}, "assets": {}, "assets_base": "../", "nav": {"categories": [{"name": "<< 𝑰𝒏𝒕𝒓𝒐𝒅𝒖𝒄𝒕𝒊𝒐𝒏 𝑻𝒐 𝑻𝒉𝒆 𝑺𝒆𝒓𝒗𝒆𝒓 >>", "items": [{"id": "1525533058483097791", "name": "✪-ɪɴᴛʀᴏᴅᴜᴄᴛɪᴏɴ", "path": "unnamed-1525533058483097791/index.html", "count": 93, "lock": false, "cur": false}, {"id": "1525533058483097792", "name": "✪-ɢᴏᴏᴅʟᴜᴄᴋ", "path": "unnamed-1525533058483097792/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1525533058483097793", "name": "✪-ʀᴇɢᴜʟᴀᴛɪᴏɴs-ʙᴏᴀʀᴅ", "path": "s-1525533058483097793/index.html", "count": 0, "lock": false, "cur": false}]}, {"name": "<< 𝑰𝒎𝒑𝒐𝒓𝒕𝒂𝒏𝒕 >>", "items": [{"id": "1525533058483097796", "name": "🍷-𝑨𝒏𝒏𝒐𝒖𝒏𝒄𝒆𝒎𝒆𝒏𝒕𝒔", "path": "unnamed-1525533058483097796/index.html", "count": 190, "lock": false, "cur": false}, {"id": "1525533058483097797", "name": "🔪-𝑹𝒂𝒊𝒅-𝑨𝒍𝒆𝒓𝒕", "path": "unnamed-1525533058483097797/index.html", "count": 44, "lock": false, "cur": false}, {"id": "1525533058483097798", "name": "🔪-𝑹𝒂𝒊𝒅-𝑹𝒆𝒔𝒖𝒍𝒕", "path": "unnamed-1525533058483097798/index.html", "count": 45, "lock": false, "cur": false}, {"id": "1525533058483097799", "name": "⏳-𝑰𝒎𝒑𝒐𝒓𝒕𝒂𝒏𝒕-𝑸𝒖𝒆𝒔𝒕", "path": "unnamed-1525533058483097799/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1525533105014702211", "name": "🗡️-𝑻𝒂𝒓𝒈𝒆𝒕-𝑨𝒍𝒆𝒓𝒕", "path": "unnamed-1525533105014702211/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1538532713009651764", "name": "📃-𝑷𝒓𝒐𝒎𝒐𝒕𝒊𝒐𝒏-𝑫𝒆𝒎𝒐𝒕𝒊𝒐𝒏𝒔", "path": "unnamed-1538532713009651764/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1539669403002601503", "name": "📝-𝑬𝒗𝒆𝒏𝒕𝒔-𝑰𝒏𝒇𝒐𝒓𝒎𝒂𝒕𝒊𝒐𝒏", "path": "unnamed-1539669403002601503/index.html", "count": 3, "lock": false, "cur": false}]}, {"name": ">> 𝑲𝒊𝒍𝒍 𝑶𝒏 𝑺𝒊𝒈𝒉𝒕 <<", "items": [{"id": "1525533059003322379", "name": "⚔️-𝑬𝒏𝒆𝒎𝒊𝒆𝒔", "path": "unnamed-1525533059003322379/index.html", "count": 1, "lock": false, "cur": false}, {"id": "1540617522322083900", "name": "🛡️-𝑪𝒐𝒂𝒍𝒊𝒕𝒊𝒐𝒏", "path": "unnamed-1540617522322083900/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1540617609752350741", "name": "🧥-𝑼𝒏𝒊𝒇𝒐𝒓𝒎𝒔", "path": "unnamed-1540617609752350741/index.html", "count": 1, "lock": false, "cur": true}, {"id": "1540617694167044096", "name": "🔪-𝑲𝒐𝒔", "path": "unnamed-1540617694167044096/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1543129274868039680", "name": "🥶-𝑨𝒍𝒕-𝑹𝒂𝒊𝒅𝒊𝒏𝒈-𝑨𝒄𝒄𝒔", "path": "unnamed-1543129274868039680/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1543133965999669388", "name": "🧐-𝑨𝒍𝒕𝒔-𝑼𝒏𝒊𝒇𝒐𝒓𝒎", "path": "unnamed-1543133965999669388/index.html", "count": 0, "lock": false, "cur": false}]}, {"name": ">> 𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔 <<", "items": [{"id": "1540612119446159390", "name": "🍻-𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔", "path": "unnamed-1540612119446159390/index.html", "count": 45615, "lock": false, "cur": false}, {"id": "1525533059003322382", "name": "📸-𝑴𝒆𝒅𝒊𝒂", "path": "unnamed-1525533059003322382/index.html", "count": 251, "lock": false, "cur": false}, {"id": "1525533059003322383", "name": "⚡𝑩𝒐𝒕-𝑪𝒎𝒅𝒔", "path": "unnamed-1525533059003322383/index.html", "count": 193, "lock": false, "cur": false}, {"id": "1540620116688109649", "name": "⚡-𝑺𝒖𝒈𝒈𝒆𝒔𝒕𝒊𝒐𝒏𝒔", "path": "unnamed-1540620116688109649/index.html", "count": 0, "lock": true, "cur": false}, {"id": "1525533059003322384", "name": "🥶-𝐅𝐮𝐧", "path": "unnamed-1525533059003322384/index.html", "count": 1250, "lock": false, "cur": false}]}, {"name": ">> 𝑽𝒐𝒊𝒄𝒆 𝑪𝒐𝒎𝒎𝒖𝒏𝒊𝒄𝒂𝒕𝒊𝒐𝒏𝒔 <<", "items": [{"id": "1540619782666321930", "name": "𝑹𝒂𝒊𝒅𝒔", "path": "unnamed-1540619782666321930/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1525533059481600197", "name": "𝑪𝒐𝒎𝒍𝒊𝒏𝒌 1", "path": "1-1525533059481600197/index.html", "count": 1199, "lock": false, "cur": false}, {"id": "1525533060026601482", "name": "𝑪𝒐𝒎𝒍𝒊𝒏𝒌 2", "path": "2-1525533060026601482/index.html", "count": 16, "lock": false, "cur": false}]}, {"name": "HR", "items": [{"id": "1534946040069754902", "name": "chat", "path": "chat-1534946040069754902/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1534946093929070773", "name": "announcements", "path": "announcements-1534946093929070773/index.html", "count": 0, "lock": false, "cur": false}]}, {"name": "Threads", "items": [{"id": "1532322068111163413", "name": "I want awna", "path": "i-want-awna-1532322068111163413/index.html", "count": 5, "lock": false, "cur": false}, {"id": "1545782311365120082", "name": "Hahahah", "path": "hahahah-1545782311365120082/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1545829388963291167", "name": "Hahahah", "path": "hahahah-1545829388963291167/index.html", "count": 0, "lock": false, "cur": false}, {"id": "1543148815480266912", "name": "UNIFORM", "path": "uniform-1543148815480266912/index.html", "count": 4, "lock": false, "cur": false}, {"id": "1546500434150035456", "name": "Kill nev", "path": "kill-nev-1546500434150035456/index.html", "count": 1, "lock": false, "cur": false}, {"id": "1546498253581717635", "name": ".̵̥̈́͛̚.̴̯̀̾͛.̵͕̈́͊̚.̶̪͒̐͠.̵̥̈́͛̚.̴̯̀̾͛...........͕̚.̶̪͒̐͠...͕̈́͊̚.̶͒͠....̪͒̐.̵̈́.̯̾͛.̵..̥.̴̀..̪.̵", "path": "unnamed-1546498253581717635/index.html", "count": 2, "lock": false, "cur": false}, {"id": "1546046329116172378", "name": "67", "path": "67-1546046329116172378/index.html", "count": 2, "lock": false, "cur": false}, {"id": "1548708273958690948", "name": "✅ ✅ ✅ ✅ ✅ ✅✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅", "path": "unnamed-1548708273958690948/index.html", "count": 6, "lock": false, "cur": false}], "threads": true}]}, "chanpaths": {"1525533058483097791": "unnamed-1525533058483097791/index.html", "1525533058483097792": "unnamed-1525533058483097792/index.html", "1525533058483097793": "s-1525533058483097793/index.html", "1525533058483097796": "unnamed-1525533058483097796/index.html", "1525533058483097797": "unnamed-1525533058483097797/index.html", "1525533058483097798": "unnamed-1525533058483097798/index.html", "1525533058483097799": "unnamed-1525533058483097799/index.html", "1525533105014702211": "unnamed-1525533105014702211/index.html", "1538532713009651764": "unnamed-1538532713009651764/index.html", "1539669403002601503": "unnamed-1539669403002601503/index.html", "1525533059003322379": "unnamed-1525533059003322379/index.html", "1540617522322083900": "unnamed-1540617522322083900/index.html", "1540617609752350741": "unnamed-1540617609752350741/index.html", "1540617694167044096": "unnamed-1540617694167044096/index.html", "1543129274868039680": "unnamed-1543129274868039680/index.html", "1543133965999669388": "unnamed-1543133965999669388/index.html", "1540612119446159390": "unnamed-1540612119446159390/index.html", "1525533059003322382": "unnamed-1525533059003322382/index.html", "1525533059003322383": "unnamed-1525533059003322383/index.html", "1540620116688109649": "unnamed-1540620116688109649/index.html", "1525533059003322384": "unnamed-1525533059003322384/index.html", "1540619782666321930": "unnamed-1540619782666321930/index.html", "1525533059481600197": "1-1525533059481600197/index.html", "1525533060026601482": "2-1525533060026601482/index.html", "1534946040069754902": "chat-1534946040069754902/index.html", "1534946093929070773": "announcements-1534946093929070773/index.html", "1532322068111163413": "i-want-awna-1532322068111163413/index.html", "1545782311365120082": "hahahah-1545782311365120082/index.html", "1545829388963291167": "hahahah-1545829388963291167/index.html", "1543148815480266912": "uniform-1543148815480266912/index.html", "1546500434150035456": "kill-nev-1546500434150035456/index.html", "1546498253581717635": "unnamed-1546498253581717635/index.html", "1546046329116172378": "67-1546046329116172378/index.html", "1548708273958690948": "unnamed-1548708273958690948/index.html"}, "current": "1540617609752350741"}</script>
+<script>
+const D = JSON.parse(document.getElementById('archive-data').textContent);
+const MSGS = D.messages || [];
+const MI = D.memberinfo || {}, RC = D.rolecolors || {}, USERS = D.users || {},
+      CHANS = D.channels || {}, ASSETS = D.assets || {}, EMOJI = D.emoji || {};
+const EBASE_RAW = D.assets_base || '';
+const EBASE = (EBASE_RAW && !EBASE_RAW.endsWith('/')) ? EBASE_RAW + '/' : EBASE_RAW;
+const res = p => (typeof p === 'string' && p && p[0] === '@') ? (ASSETS[p.slice(1)] || '')
+                 : (p ? EBASE + p : '');
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls;
+    if (txt !== undefined) n.textContent = txt; return n; };
+const colhex = c => (c && c > 0) ? '#' + Number(c).toString(16).padStart(6, '0') : null;
+const DAY = t => { const d = new Date(t); return isNaN(d) ? '' : d.toDateString(); };
+const ts = t => { const d = new Date(t); return isNaN(d) ? '' :
+    d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); };
+const full = t => { const d = new Date(t); return isNaN(d) ? '' :
+    d.toLocaleString([], {month:'numeric', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'}); };
+const dayLabel = t => {
+  const d = new Date(t), n = new Date(), same = (a,b) => a.toDateString() === b.toDateString();
+  if (same(d,n)) return 'Today';
+  if (same(d, new Date(n.getTime() - 864e5))) return 'Yesterday';
+  return d.toLocaleDateString([], {month:'long', day:'numeric', year:'numeric'});
+};
+
+function idn(id) { const m = MI[id] || {}; return m.n || USERS[id] || null; }
+function avatarFor(id) { const m = MI[id] || {}; return m.av ? res(m.av) : ''; }
+function nameColor(id) { const m = MI[id] || {}; return m.c ? colhex(m.c) : null; }
+function mention(id) {
+  const n = el('span', 'mention', '@' + (idn(id) || 'unknown-user'));
+  n.title = 'user id ' + id;
+  n.onclick = e => { e.stopPropagation(); openUser(id, e.clientX, e.clientY); };
+  return n;
+}
+function roleMention(id) {
+  const r = RC[id] || {}, n = el('span', 'mention', '@' + (r.name || 'deleted-role'));
+  if (colhex(r.color)) n.style.color = colhex(r.color);
+  return n;
+}
+function chanMention(id) {
+  const name = CHANS[id] || 'unknown-channel';
+  const path = (D.chanpaths || {})[id];
+  if (!path) {
+    const s = el('span', 'mention', '#' + name);
+    s.title = 'this channel is not in the archive (or not readable by the archiving account)';
+    return s;
+  }
+  const a = el('a', 'mention', '#' + name);
+  a.href = res(path);
+  a.title = 'go to #' + name;
+  return a;
+}
+
+function inline(text) {
+  const frag = document.createDocumentFragment();
+  const re = /<@!?(\d+)>|<@&(\d+)>|<#(\d+)>|(@everyone|@here)|(`[^`\n]+`)|(https?:\/\/[^\s<]+)|<a?:([\w~]+):(\d+)>|\|\|([^|]+)\|\||\n/g;
+  let last = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+    last = re.lastIndex;
+    if (m[1]) frag.appendChild(mention(m[1]));
+    else if (m[2]) frag.appendChild(roleMention(m[2]));
+    else if (m[3]) frag.appendChild(chanMention(m[3]));
+    else if (m[4]) frag.appendChild(el('span', 'mention', m[4]));
+    else if (m[5]) frag.appendChild(el('code', null, m[5].slice(1, -1)));
+    else if (m[6]) { const a = el('a', null, m[6]); a.href = m[6]; a.target = '_blank';
+                     a.rel = 'noopener'; frag.appendChild(a); }
+    else if (m[7]) {
+      const src = EMOJI[m[8]];
+      if (src) { const i = el('img', 'emoji'); i.src = res(src); i.alt = ':' + m[7] + ':';
+                 i.title = ':' + m[7] + ':'; frag.appendChild(i); }
+      else frag.appendChild(document.createTextNode(':' + m[7] + ':'));
+    }
+    else if (m[9]) { const s = el('span', 'spoiler', m[9]);
+                     s.onclick = e => { e.stopPropagation(); s.classList.add('open'); };
+                     frag.appendChild(s); }
+    else if (m[10]) frag.appendChild(document.createElement('br'));
+  }
+  if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+  return frag;
+}
+
+const FONTS = {1:["Bangers","Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"],
+  2:["BioRhyme","Rockwell, 'Roboto Slab', Georgia, serif"],
+  3:["Sakura (Cherry Bomb)","'Comic Sans MS', 'Chalkboard SE', cursive"],
+  4:["Jellybean (Chicle)","'Comic Sans MS', 'Marker Felt', cursive"],
+  5:["Compagnon","'Courier New', Courier, monospace"],
+  6:["Modern (Museo Moderno)","'Trebuchet MS', Verdana, sans-serif"],
+  7:["Medieval (Neo-Castel)","Luminari, Papyrus, fantasy"],
+  8:["8Bit (Pixelify Sans)","'Courier New', Courier, monospace"],
+  9:["Ribes","'Brush Script MT', 'Snell Roundhand', cursive"],
+  10:["Vampyre (Sinistre)","Luminari, Papyrus, fantasy"],
+  11:["gg Sans (default)",""],
+  12:["Tempo (Zilla Slab)","Rockwell, Georgia, serif"],
+  13:["Monkey Bars (Playpen Sans)","'Comic Sans MS', 'Chalkboard SE', cursive"],
+  14:["Mainframe (Orbitron)","Verdana, Tahoma, sans-serif"],
+  15:["Headbang (New Rocker)","Luminari, Papyrus, fantasy"],
+  16:["Journal (Kalam)","'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive"]};
+const EFFECTS = {1:"solid", 2:"gradient", 3:"neon", 4:"toon", 5:"pop", 6:"glow", 7:"prism", 8:"gummy"};
+const chex = n => (n == null ? null : '#' + Number(n).toString(16).padStart(6, '0'));
+function styleName(node, mi) {
+  const cols = (mi.fc || []).map(c => chex(c) || '#fff');
+  switch (mi.eid) {
+    case 2:
+      if (cols.length > 1) {
+        node.style.backgroundImage = 'linear-gradient(90deg, ' + cols.join(', ') + ')';
+        node.style.webkitBackgroundClip = 'text'; node.style.backgroundClip = 'text';
+        node.style.color = 'transparent';
+      } else if (cols.length) node.style.color = cols[0];
+      break;
+    case 3:
+      if (cols[0]) { node.style.color = cols[0];
+        node.style.textShadow = '0 0 4px ' + cols[0] + ', 0 0 9px ' + cols[0]; }
+      break;
+    case 4:
+      node.style.color = cols[0] || '#fff'; node.style.webkitTextStroke = '1.5px #000';
+      node.style.textShadow = '1px 1px 0 #000'; break;
+    case 5:
+      node.style.color = cols[0] || '#fff';
+      node.style.textShadow = '2px 2px 0 ' + (cols[1] || 'rgba(0,0,0,.75)'); break;
+    case 6:
+      if (cols[0]) { node.style.color = cols[0]; node.style.textShadow = '0 0 6px ' + cols[0]; }
+      break;
+    case 7:
+      if (cols.length) { node.style.color = cols[0];
+        node.style.textShadow = cols.slice(0, 5).map((c, i) => ((i - 2) * 1.3) + 'px 0 0 ' + c).join(', '); }
+      break;
+    case 8:
+      node.style.color = cols[0] || '#fff';
+      node.style.textShadow = '0 1px 0 ' + (cols[1] || 'rgba(0,0,0,.6)') +
+        ', 0 -1px 0 rgba(255,255,255,.35)'; break;
+    default:
+      if (mi.eid === 1 && cols[0]) node.style.color = cols[0];
+  }
+  const f = FONTS[mi.fid];
+  if (f && f[1]) node.style.fontFamily = f[1];
+  if (mi.fid === 8) node.style.letterSpacing = '.5px';
+  if (mi.fid === 14) node.style.letterSpacing = '.3px';
+}
+function displayName(id, text) {
+  const mi = MI[id] || {};
+  const wrap = el('span', 'dname');
+  const nm = el('span', 'nmtext', text);
+  const rc = nameColor(id); if (rc) nm.style.color = rc;      // role colour first
+  styleName(nm, mi);                                          // style wins if set
+  wrap.appendChild(nm);
+  if (mi.ct) {                       // Discord puts the clan tag AFTER the name
+    const tag = el('span', 'clantag');
+    if (mi.cb) { const im = el('img'); im.src = res(mi.cb); im.alt = '';
+                 im.onerror = () => im.remove(); tag.appendChild(im); }
+    tag.appendChild(el('span', null, '[' + mi.ct + ']'));
+    tag.title = 'clan tag';
+    wrap.appendChild(tag);
+  }
+  return wrap;
+}
+
+const CHUNK = 400, MAXHITS = 1000, GROUP_MS = 7 * 60 * 1000;
+let winStart = 0, winEnd = MSGS.length, filterHits = null, pending = false, stick = true;
+const M = document.getElementById('m');
+const scroller = document.getElementById('scroller');
+
+function attachmentNode(at, cont) {
+  const wrap = el('div', 'att');
+  const local = at._local || at.local || '';
+  const isImg = /^image\//.test(at.content_type || '') || /\.(png|jpe?g|gif|webp|avif)$/i.test(at.filename || '');
+  if (at._quarantined) {
+    wrap.appendChild(el('div', 'quar', '\u26d4 blocked by the archiver (executable-looking): ' + (at.filename || '')));
+  } else if (isImg && local) {
+    const img = el('img', 'media'); img.src = res(local); img.loading = 'lazy'; img.alt = at.filename || '';
+    img.onclick = e => { e.stopPropagation(); const lb = document.getElementById('lightbox');
+      lb.querySelector('img').src = img.src; lb.classList.add('open'); };
+    wrap.appendChild(img);
+  } else if (local) {
+    const a = el('a', 'filechip'); a.href = res(local); a.download = at.filename || '';
+    a.appendChild(el('span', null, '\u2b07 ' + (at.filename || 'file')));
+    a.appendChild(el('span', 'sz', ((at.size || 0) / 1024).toFixed(1) + ' KB'));
+    wrap.appendChild(a);
+  } else if (!local && at.url) {
+    const a = el('a', 'filechip'); a.href = at.url; a.target = '_blank'; a.rel = 'noopener';
+    a.appendChild(el('span', null, '\u2601 ' + (at.filename || 'file')));
+    a.appendChild(el('span', 'sz', 'not in this archive \u2014 Discord CDN link (may expire)'));
+    wrap.appendChild(a);
+  } else if (!local) {
+    wrap.appendChild(el('div', 'quar', 'attachment not in this archive: ' + (at.filename || '')));
+  }
+  if (wrap.childNodes.length) cont.appendChild(wrap);
+}
+
+function embedNode(em, cont) {
+  const card = el('div', 'embed');
+  const src = s => s && (s._local ? res(s._local) : (s.url || '')) || '';
+  if (em.color) card.style.borderLeftColor = colhex(em.color);
+  const isGifv = em.type === 'gifv' || !!(em.video && em.video.url);
+  const remoteImg = (s, cls) => {
+    const img = el('img', cls); img.loading = 'lazy'; img.decoding = 'async';
+    img.src = src(s);
+    img.alt = em.title || '';
+    if (s.proxy_url) img.dataset.proxy = s.proxy_url;
+    img.onerror = () => {
+      if (img.dataset.proxy && img.src !== img.dataset.proxy) {
+        const p = img.dataset.proxy; img.dataset.proxy = '';
+        img.src = /^https?:/.test(p) ? p : 'https://images-ext-1.discordapp.net/' + p;
+      } else img.remove();
+    };
+    img.onclick = e => { e.stopPropagation(); const lb = document.getElementById('lightbox');
+      lb.querySelector('img').src = img.src; lb.classList.add('open'); };
+    return img;
+  };
+  if (!isGifv && em.thumbnail && src(em.thumbnail)) {
+    card.appendChild(remoteImg(em.thumbnail, 'ethumb'));
+  }
+  if (em.provider && em.provider.name) card.appendChild(el('div', 'eprov', em.provider.name));
+  else if (em.author && em.author.name) card.appendChild(el('div', 'eprov', em.author.name));
+  if (em.title) { const t = el('a', 'etitle', em.title); if (em.url) { t.href = em.url; t.target = '_blank'; }
+                  card.appendChild(t); }
+  if (em.description) card.appendChild(el('div', 'edesc', em.description.slice(0, 600)));
+  for (const f of (em.fields || []).slice(0, 8)) {
+    card.appendChild(el('div', 'eprov', f.name || ''));
+    card.appendChild(el('div', 'edesc', (f.value || '').slice(0, 300)));
+  }
+  if (isGifv && em.thumbnail && src(em.thumbnail)) {
+    const m = remoteImg(em.thumbnail, 'media'); m.style.cursor = 'zoom-in';
+    card.appendChild(m);
+    if (em.video && em.video.url) {
+      const play = el('a', 'efoot', '\u25b6 play');
+      play.href = '#'; play.title = 'loads the video from the internet (not stored in the archive)';
+      play.onclick = e => { e.preventDefault(); e.stopPropagation();
+        const v = el('video'); v.src = em.video.url; v.controls = true; v.autoplay = true;
+        v.muted = true; v.loop = true; v.playsInline = true;
+        v.style.cssText = 'max-width:400px;max-height:300px;border-radius:8px;display:block;margin-top:6px';
+        m.replaceWith(v); };
+      card.appendChild(play);
+      card.appendChild(el('span', 'efoot', ' \u00b7 '));
+    }
+    const link = el('a', 'efoot', '\u2197 ' + (em.url || '').replace(/^https?:\/\//, '').slice(0, 64));
+    link.href = em.url || em.thumbnail.url; link.target = '_blank'; card.appendChild(link);
+  } else if (em.video && em.video.url) {
+    const l = el('a', 'efoot', '\u25b6 ' + em.video.url.slice(0, 60));
+    l.href = em.video.url; l.target = '_blank'; card.appendChild(l);
+  }
+  if (em.image && src(em.image)) { const i = remoteImg(em.image, 'media');
+                                   card.appendChild(i); }
+  if (em.footer && em.footer.text) card.appendChild(el('div', 'efoot', em.footer.text));
+  if (em.url && !em.title && !em.video) { const l = el('a', 'efoot', em.url); l.href = em.url;
+                                          l.target = '_blank'; card.appendChild(l); }
+  if (card.childNodes.length) cont.appendChild(card);
+}
+
+function rowBody(m, cont) {
+  if (m.message_reference && m.message_reference.message_id) {
+    const ref = m.referenced_message || null;
+    const line = el('div', 'replyline');
+    const rid = ref && (ref.author || {}).id;
+    if (rid) {
+      const ra = el('img', 'rAv'); ra.src = avatarFor(rid); ra.alt = '';
+      ra.onerror = () => ra.remove(); line.appendChild(ra);
+      const rn = displayName(rid, idn(rid) || 'unknown');
+      rn.classList.add('rName');
+      rn.onclick = e => { e.stopPropagation(); openUser(rid, e.clientX, e.clientY); };
+      line.appendChild(rn);
+    }
+    const rt = el('span', 'rTxt');
+    if (ref) {
+      const txt = (ref.content || '').slice(0, 160) ||
+        ((ref.attachments || []).length ? '\u2b07 ' + ref.attachments[0].filename : 'click to see');
+      rt.appendChild(inline(txt));
+    } else rt.textContent = 'original message not captured (id ' + m.message_reference.message_id + ')';
+    line.appendChild(rt);
+    line.title = ref ? 'jump to this message' : 'the original message is not in this archive';
+    line.onclick = e => { e.stopPropagation(); jumpTo(m.message_reference.message_id); };
+    cont.appendChild(line);
+  }
+  if (m.content) { const b = el('div', 'body'); b.appendChild(inline(m.content)); cont.appendChild(b); }
+  for (const at of (m.attachments || [])) attachmentNode(at, cont);
+  for (const em of (m.embeds || [])) embedNode(em, cont);
+  for (const st of (m.sticker_items || [])) {
+    const s = el('div', 'sticker');
+    s.appendChild(el('span', null, '\u25a0'));
+    s.appendChild(el('span', null, (st.name || 'sticker') + ' \u2014 sticker'));
+    if (st.format_type === 3) s.appendChild(el('span', 'sz', '(animated)'));
+    cont.appendChild(s);
+  }
+  if (m.poll) {
+    const p = m.poll, pr = p.results || {}, counts = {};
+    for (const a of (pr.answer_counts || [])) counts[a.id] = a.count;
+    const box = el('div', 'poll');
+    box.appendChild(el('div', 'pq', (p.question && p.question.text) || 'poll'));
+    for (const a of (p.answers || [])) {
+      const row = el('div', 'prow'), pm = a.poll_media || {};
+      if (pm.emoji && pm.emoji.id && EMOJI[pm.emoji.id]) {
+        const i = el('img'); i.src = res(EMOJI[pm.emoji.id]); i.alt = pm.emoji.name || '';
+        row.appendChild(i);
+      } else if (pm.emoji && pm.emoji.name) row.appendChild(el('span', 'pemoji', pm.emoji.name));
+      row.appendChild(el('span', 'pt', pm.text || '(answer ' + a.answer_id + ')'));
+      const c = counts[a.answer_id];
+      if (typeof c === 'number') row.appendChild(el('span', 'pc', c + (c === 1 ? ' vote' : ' votes')));
+      box.appendChild(row);
+    }
+    const foot = [];
+    if (p.allow_multiselect) foot.push('multi-select');
+    if (pr.is_finalized) foot.push('poll closed');
+    if (p.expiry) foot.push('closed ' + full(p.expiry).replace(' at', ','));
+    if (foot.length) box.appendChild(el('div', 'pfoot', foot.join(' \u00b7 ')));
+    cont.appendChild(box);
+  }
+  for (const sn of (m.message_snapshots || [])) {
+    const sm = sn.message || {}, sa = sm.author || {};
+    const fw = el('div', 'fwd');
+    fw.appendChild(el('div', 'fh', '\u21aa forwarded'));
+    fw.appendChild(el('div', 'fname', sa.global_name || sa.username || 'unknown'));
+    if (sm.content) fw.appendChild(el('div', 'fbody', sm.content.slice(0, 800)));
+    cont.appendChild(fw);
+  }
+  if ((m.reactions || []).length) {
+    const rw = el('div', 'reacts');
+    for (const r of m.reactions) {
+      const pill = el('span', 'react');
+      const e = r.emoji || {};
+      const src = e.id ? EMOJI[e.id] : null;
+      if (src) { const i = el('img'); i.src = res(src); i.alt = e.name || ''; pill.appendChild(i); }
+      else pill.appendChild(el('span', null, e.name || '\u2753'));
+      pill.appendChild(el('span', null, String(r.count)));
+      pill.title = r.count + (r.count === 1 ? ' reaction' : ' reactions');
+      rw.appendChild(pill);
+    }
+    cont.appendChild(rw);
+  }
+}
+
+function rowAt(i) {
+  const m = MSGS[i], p = i > 0 ? MSGS[i - 1] : null;
+  let node;
+  if (m.type === 7) {
+    const s = el('div', 'sysline');
+    s.appendChild(el('span', 'si', '\u2728'));
+    s.appendChild(el('span', null, (idn((m.author || {}).id) || (m.author || {}).username || 'someone')
+      + ' joined the server.'));
+    node = s;
+  } else {
+    node = msgRow(m, p);
+  }
+  node.id = 'm-' + m.id;
+  node.dataset.mid = String(m.id);
+  return node;
+}
+
+function msgRow(m, p) {
+  const a = m.author || {}, id = a.id;
+  const grouped = !!(p && (p.author || {}).id === id && p.type !== 19 && m.type !== 19 &&
+    DAY(p.timestamp) === DAY(m.timestamp) &&
+    (new Date(m.timestamp) - new Date(p.timestamp)) < GROUP_MS);
+  const div = el('div', 'msg' + (grouped ? '' : ' groupStart'));
+  const gut = el('span', 'gutter', ts(m.timestamp));
+  gut.title = full(m.timestamp);
+  div.appendChild(gut);
+  if (!grouped) {
+    const src = avatarFor(id);
+    const av = el('div', 'av');
+    if (src) { const img = el('img'); img.src = src; img.alt = '';
+               img.onerror = () => { img.remove(); av.textContent = (idn(id) || '?').slice(0, 1).toUpperCase(); };
+               av.appendChild(img); }
+    else av.textContent = (idn(id) || '?').slice(0, 1).toUpperCase();
+    av.onclick = e => openUser(id, e.clientX, e.clientY);
+    div.appendChild(av);
+  }
+  const cont = el('div', 'contents');
+  if (!grouped) {
+    const h = el('div', 'head');
+    const nm = displayName(id, idn(id) || a.username || 'unknown');
+    nm.classList.add('name');
+    nm.onclick = e => openUser(id, e.clientX, e.clientY);
+    h.appendChild(nm);
+    if (a.bot) h.appendChild(el('span', 'bot', 'APP'));
+    const t = el('span', 'ts', ts(m.timestamp)); t.title = full(m.timestamp); h.appendChild(t);
+    if (m.edited_timestamp) h.appendChild(el('span', 'edited', '(edited)'));
+    cont.appendChild(h);
+  }
+  rowBody(m, cont);
+  div.appendChild(cont);
+  return div;
+}
+
+function daysep(t) { const d = el('div', 'daysep'); d.appendChild(el('span', null, dayLabel(t))); return d; }
+function fragmentFor(start, end) {
+  const frag = document.createDocumentFragment();
+  for (let i = start; i < end; i++) {
+    if (i === 0 || DAY(MSGS[i].timestamp) !== DAY(MSGS[i - 1].timestamp)) frag.appendChild(daysep(MSGS[i].timestamp));
+    frag.appendChild(rowAt(i));
+  }
+  return frag;
+}
+function renderAll() { M.innerHTML = ''; M.appendChild(fragmentFor(winStart, winEnd)); }
+function snapBottom() { if (!scroller || !stick) return; scroller.scrollTop = scroller.scrollHeight; }
+window.addEventListener('load', snapBottom);
+setTimeout(snapBottom, 250);
+document.addEventListener('load', e => { if (stick && e.target && e.target.tagName === 'IMG') snapBottom(); }, true);
+if (M && MSGS.length) { winStart = Math.max(0, MSGS.length - CHUNK); winEnd = MSGS.length; renderAll(); snapBottom(); }
+
+function loadOlder() {
+  if (pending || filterHits || winStart <= 0) return;
+  pending = true;
+  const before = scroller.scrollHeight - scroller.scrollTop;
+  winStart = Math.max(0, winStart - CHUNK);
+  M.insertBefore(fragmentFor(winStart, Math.min(winStart + CHUNK, winEnd)), M.firstChild);
+  scroller.scrollTop = scroller.scrollHeight - before;
+  pending = false;
+}
+function loadNewer() {
+  if (pending || filterHits || winEnd >= MSGS.length) return;
+  pending = true;
+  const from = winEnd;
+  winEnd = Math.min(MSGS.length, winEnd + CHUNK);
+  M.appendChild(fragmentFor(from, winEnd));
+  pending = false;
+}
+if (scroller) scroller.addEventListener('scroll', () => {
+  if (scroller.scrollTop < 400) loadOlder();
+  if (scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 600) loadNewer();
+  stick = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 120;
+  const j = document.getElementById('jump');
+  if (j) j.style.display = stick ? 'none' : 'flex';
+});
+
+function flash(node) {
+  node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash');
+  setTimeout(() => node.classList.remove('flash'), 1900);
+}
+function toast(text) {
+  let t = document.getElementById('toast');
+  if (!t) { t = el('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = text; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function jumpTo(mid) {
+  const key = String(mid);
+  if (filterHits) { qel.value = ''; runSearch(); }
+  stick = false;                          // inspecting a point, not following the tail
+  let node = document.getElementById('m-' + key);
+  if (node) { node.scrollIntoView({block: 'center'}); flash(node); return; }
+  const idx = MSGS.findIndex(m => String(m.id) === key);
+  if (idx < 0) { toast('that message is not in this archive'); return; }
+  winStart = Math.max(0, idx - 60);
+  winEnd = Math.min(MSGS.length, idx + 200);
+  renderAll();
+  node = document.getElementById('m-' + key);
+  if (node) { node.scrollIntoView({block: 'center'}); flash(node); }
+  else toast('could not jump to that message');
+}
+
+const qel = document.getElementById('q'), cnt = document.getElementById('count');
+let HAYC = null, VOCAB = null;
+const FUZZ = new Map();
+function levMax(a, b, k) {              /* bounded Levenshtein: stops at k+1 */
+  if (Math.abs(a.length - b.length) > k) return k + 1;
+  let prev = [];
+  for (let j = 0; j <= b.length; j++) prev[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let best = i;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < best) best = cur[j];
+    }
+    if (best > k) return k + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function buildHay() {                    /* once per page: searchable text + word set */
+  if (HAYC) return;
+  HAYC = new Array(MSGS.length);
+  VOCAB = new Map();
+  for (let i = 0; i < MSGS.length; i++) {
+    const m = MSGS[i], a = m.author || {}, mi = MI[a.id] || {};
+    const pollText = m.poll ? [((m.poll.question || {}).text || ''),
+      ...(m.poll.answers || []).map(x => ((x.poll_media || {}).text || ''))].join(' ') : '';
+    const txt = [m.content || '', a.username || '', a.global_name || '', a.id || '', mi.n || '',
+      (mi.r || []).map(r => r.n).join(' '), (m.attachments || []).map(x => x.filename || '').join(' '),
+      pollText
+    ].join(' ').toLowerCase();
+    const words = new Set(txt.split(/[^a-z0-9]+/).filter(w => w.length > 2));
+    HAYC[i] = {txt: txt, words: words};
+    for (const w of words) {
+      if (w.length < 4) continue;
+      let arr = VOCAB.get(w[0]);
+      if (!arr) VOCAB.set(w[0], arr = new Set());
+      arr.add(w);
+    }
+  }
+}
+function fuzzyWords(t) {                 /* vocab words within a small edit distance of t */
+  if (FUZZ.has(t)) return FUZZ.get(t);
+  let out = null;
+  const k = t.length >= 9 ? 2 : 1;
+  if (t.length >= 4 && VOCAB) {
+    const cand = VOCAB.get(t[0]);
+    if (cand) for (const w of cand) {
+      if (Math.abs(w.length - t.length) <= k && levMax(t, w, k) <= k) {
+        if (!out) out = new Set();
+        out.add(w);
+      }
+    }
+  }
+  FUZZ.set(t, out);
+  return out;
+}
+function runSearch() {
+  const raw = (qel.value || '').trim().toLowerCase();
+  if (!raw) { filterHits = null; winStart = Math.max(0, MSGS.length - CHUNK); renderAll(); snapBottom();
+            if (cnt) cnt.textContent = ''; return; }
+  buildHay();
+  const phrases = [];
+  const rest = raw.replace(/"([^"]*)"/g, function (all, inner) {
+    if (inner.trim()) phrases.push(inner.trim());
+    return ' ';
+  });
+  const words = rest.split(/\s+/).filter(function (t) { return t.length > 0; });
+  const tests = [];
+  for (const t of phrases.concat(words)) tests.push({t: t, fz: null});
+  function collect() {
+    const out = [];
+    for (let i = 0; i < MSGS.length && out.length < MAXHITS; i++) {
+      const h = HAYC[i];
+      let ok = true;
+      for (const x of tests) {
+        if (h.txt.includes(x.t)) continue;
+        let via = false;
+        if (x.fz) for (const w of x.fz) { if (h.words.has(w)) { via = true; break; } }
+        if (!via) { ok = false; break; }
+      }
+      if (ok) out.push(i);
+    }
+    return out;
+  }
+  let hits = collect();
+  if (!hits.length) {
+    let any = false;
+    for (const x of tests) {
+      if (x.t.indexOf(' ') >= 0 || x.t.length < 4) continue;
+      let direct = 0;
+      for (let i = 0; i < HAYC.length && !direct; i++) if (HAYC[i].txt.includes(x.t)) direct = 1;
+      if (!direct) { const fz = fuzzyWords(x.t); if (fz) { x.fz = fz; any = true; } }
+    }
+    if (any) hits = collect();
+  }
+  filterHits = hits;
+  M.innerHTML = '';
+  if (!hits.length) { if (cnt) cnt.textContent = '0 matches'; return; }
+  for (const i of hits.slice(0, 200)) {
+    const d = el('div', 'daysep hitsep');
+    d.appendChild(el('span', null, full(MSGS[i].timestamp)));
+    const j = el('a', 'jumpctx', '\u21aa jump to context');
+    j.href = '#'; j.title = 'leave the search and show this message where it sits in the channel';
+    j.onclick = ev => { ev.preventDefault(); ev.stopPropagation(); jumpTo(MSGS[i].id); };
+    d.appendChild(j);
+    M.appendChild(d);
+    M.appendChild(rowAt(i));
+  }
+  let note = '';
+  if (hits.length) {
+    for (const x of tests) {             /* announce when a word matched only via typo-fit */
+      if (!x.fz) continue;
+      const t = x.t, seen = new Set();
+      for (const i of hits.slice(0, 300)) for (const w of HAYC[i].words) {
+        if (x.fz.has(w)) seen.add(w);
+      }
+      if (seen.size) note += (note ? '; ' : '') + t + ' = ' + Array.from(seen).slice(0, 2).join('/');
+    }
+  }
+  const shown = hits.length >= MAXHITS ? MAXHITS + '+' : String(hits.length);
+  if (cnt) cnt.textContent = shown + ' match' + (hits.length === 1 ? '' : 'es') + ' of ' + MSGS.length
+    + (note ? '  (typo-fit: ' + note + ')' : '');
+  scroller.scrollTop = 0;
+}
+if (qel) qel.addEventListener('input', () => { clearTimeout(qel._t); qel._t = setTimeout(runSearch, 180); });
+const jn = document.getElementById('jump-new'), jo = document.getElementById('jump-old');
+if (jn) jn.onclick = () => { stick = true; if (filterHits) { qel.value = ''; runSearch(); }
+  winStart = Math.max(0, MSGS.length - CHUNK); winEnd = MSGS.length; renderAll(); snapBottom(); };
+if (jo) jo.onclick = () => { if (filterHits) return; winStart = Math.max(0, winStart - 4 * CHUNK);
+  renderAll(); scroller.scrollTop = 0; };
+
+const pop = document.getElementById('pop');
+function openUser(id, x, y) {
+  const m = MI[id] || {}, u = USERS[id] || {};
+  pop.innerHTML = '';
+  const banner = el('div', 'pbanner');
+  banner.style.background = (m.bn ? colhex(m.bn) : (m.ac ? colhex(m.ac) : '#5865f2'));
+  pop.appendChild(banner);
+  const body = el('div', 'pbody'); pop.appendChild(body);
+  const av = el('div', 'pav');
+  const src = avatarFor(id);
+  if (src) { const img = el('img'); img.src = src; img.onerror = () => img.remove(); av.appendChild(img); }
+  else av.textContent = (idn(id) || '?').slice(0, 1).toUpperCase();
+  body.appendChild(av);
+  const nm = el('div', 'pname');
+  nm.appendChild(displayName(id, idn(id) || m.u || 'unknown'));
+  body.appendChild(nm);
+  body.appendChild(el('div', 'puser', m.u ? '@' + m.u : 'id ' + id));
+  const card = el('div', 'pcard');
+  card.appendChild(el('h3', null, 'member info'));
+  const rows = [
+    ['member since', m.j ? new Date(m.j).toLocaleDateString([], {day:'numeric', month:'short', year:'numeric'}) : 'not in the server'],
+    ['account created', m.a ? new Date(m.a).toLocaleDateString([], {day:'numeric', month:'short', year:'numeric'}) : '\u2014'],
+    ['user id', id],
+    ['messages in archive', String(m.mi == null ? 0 : m.mi)],
+    ['first seen', m.f ? full(m.f) : '\u2014'],
+    ['last seen', m.l ? full(m.l) : '\u2014'],
+  ];
+  if (m.ct) rows.push(['clan tag', m.ct]);
+  if (m.fid != null) rows.push(['name font', FONTS[m.fid]
+    ? FONTS[m.fid][0] + ' \u2014 approximated with local fonts'
+    : 'font id ' + m.fid + ' (not in the local mapping)']);
+  if (m.eid != null) rows.push(['name effect', (EFFECTS[m.eid] || ('effect id ' + m.eid)) +
+    ((m.fc && m.fc.length) ? ' \u2014 ' + m.fc.map(c => chex(c)).join(', ') : '')]);
+  if (m.bot) rows.push(['bot account', 'yes']);
+  for (const [k, v] of rows) { const r = el('div', 'prow');
+    r.appendChild(el('span', null, k)); r.appendChild(el('span', null, v)); card.appendChild(r); }
+  body.appendChild(card);
+  body.appendChild(el('h3', 'roleshead', 'roles \u2014 ' + ((m.r || []).length || 0)));
+  const chips = el('div', 'proles');
+  if ((m.r || []).length) {
+    for (const r of m.r) {
+      const c = el('span', 'rchip');
+      const dot = el('span', 'rdot');
+      dot.style.background = r.c ? colhex(r.c) : 'var(--interactive-muted)';
+      c.appendChild(dot); c.appendChild(el('span', null, r.n)); chips.appendChild(c);
+    }
+  } else chips.appendChild(el('span', 'rchip', 'no roles'));
+  body.appendChild(chips);
+  pop.style.display = 'block';
+  pop.style.left = Math.max(8, Math.min(x, innerWidth - 316)) + 'px';
+  pop.style.top = Math.max(8, Math.min(y + 8, innerHeight - pop.offsetHeight - 8)) + 'px';
+}
+document.addEventListener('click', e => {
+  if (pop.contains(e.target)) return;
+  const t = e.target;
+  if (t && t.closest && t.closest('.name,.av,.mrow,.rName')) return;
+  pop.style.display = 'none';
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { pop.style.display = 'none'; document.getElementById('lightbox').classList.remove('open'); }
+});
+document.getElementById('lightbox').onclick = () => document.getElementById('lightbox').classList.remove('open');
+
+function memberList() {
+  const host = document.getElementById('memlist');
+  if (!host) return;
+  const members = D.members || [], roles = D.roles || [];
+  if (!members.length) return;
+  const byId = new Map(); for (const r of roles) byId.set(String(r.id), r);
+  const groups = new Map(), rest = [];
+  for (const mem of members) {
+    const held = (mem.r || []).map(id => byId.get(String(id))).filter(Boolean);
+    const hoisted = held.filter(r => r.hoist).sort((a, b) => (b.position || 0) - (a.position || 0))[0];
+    if (hoisted) { if (!groups.has(hoisted.id)) groups.set(hoisted.id, []);
+                   groups.get(hoisted.id).push(mem); }
+    else rest.push(mem);
+  }
+  host.appendChild(el('div', 'mhead', members.length + ' members'));
+  const mhead = host.querySelector('.mhead');
+  const x = el('button', 'mclose', '\u2715');
+  x.title = 'hide the member list';
+  x.onclick = ev => { ev.stopPropagation(); host.classList.remove('open');
+    const b = document.getElementById('mem-toggle'); if (b) b.classList.remove('on'); };
+  mhead.appendChild(x);
+  const sorted = roles.filter(r => r.hoist).sort((a, b) => (b.position || 0) - (a.position || 0));
+  const addGroup = (role, items) => {
+    if (!items.length) return;
+    const h = el('div', 'mgroup', (role ? role.name : 'members') + ' \u2014 ' + items.length);
+    if (role && role.color) h.style.color = colhex(role.color);
+    host.appendChild(h);
+    for (const mem of items) {
+      const r = el('div', 'mrow' + (mem.ins ? '' : ' off'));
+      const av = el('div', 'mAv');
+      if (mem.av) { const img = el('img'); img.src = res(mem.av); img.alt = '';
+                    img.onerror = () => { img.remove(); av.textContent = (mem.n || '?').slice(0,1).toUpperCase(); };
+                    av.appendChild(img); }
+      else av.textContent = (mem.n || '?').slice(0, 1).toUpperCase();
+      if (mem.c) av.style.background = colhex(mem.c);
+      r.appendChild(av);
+      const nm = el('div', 'mName');
+      nm.appendChild(displayName(mem.id, mem.n || mem.id));
+      const mi2 = MI[mem.id] || {};
+      if (!mi2.c && !mi2.eid && role && role.color) {
+        const t = nm.querySelector('.nmtext'); if (t) t.style.color = colhex(role.color);
+      }
+      r.appendChild(nm);
+      if (mem.bot) r.appendChild(el('span', 'mTag', 'APP'));
+      if (!mem.ins) r.appendChild(el('span', 'mTag', 'left'));
+      r.onclick = e => { e.stopPropagation(); openUser(mem.id, e.clientX, e.clientY); };
+      host.appendChild(r);
+    }
+  };
+  for (const role of sorted) addGroup(role, groups.get(role.id) || []);
+  addGroup(null, rest);
+}
+memberList();
+const mbtn = document.getElementById('mem-toggle');
+if (mbtn) mbtn.onclick = () => { const host = document.getElementById('memlist');
+  host.classList.toggle('open'); mbtn.classList.toggle('on'); };
+const sbtn = document.getElementById('side-toggle');
+if (sbtn) sbtn.onclick = () => document.querySelector('.side').classList.toggle('open');
+for (const h of document.querySelectorAll('.catHead')) h.onclick = () => h.parentElement.classList.toggle('closed');
+</script>
+</body></html>
